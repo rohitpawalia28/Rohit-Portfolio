@@ -10,6 +10,7 @@ const inMemoryMessages = [];
 const adminEmail = process.env.ADMIN_EMAIL;
 const adminPassword = process.env.ADMIN_PASSWORD;
 const jwtSecret = process.env.JWT_SECRET;
+let mongoConnectionPromise;
 
 app.use(cors());
 app.use(express.json({ limit: '20kb' }));
@@ -25,13 +26,33 @@ function requireAdmin(req, res, next) {
   }
 }
 
-if (process.env.MONGODB_URI && mongoose.connection.readyState === 0) {
-  mongoose.connect(process.env.MONGODB_URI)
-    .then(() => console.log('Connected to MongoDB.'))
-    .catch((error) => console.error('MongoDB connection failed:', error.message));
-} else if (!process.env.MONGODB_URI) {
-  console.warn('MONGODB_URI is not set. Contact messages are retained only while the server runs.');
+async function connectToMongo() {
+  if (!process.env.MONGODB_URI) return false;
+  if (mongoose.connection.readyState === 1) return true;
+
+  if (!mongoConnectionPromise) {
+    mongoConnectionPromise = mongoose.connect(process.env.MONGODB_URI, { serverSelectionTimeoutMS: 10000 })
+      .then(() => {
+        console.log('Connected to MongoDB.');
+        return true;
+      })
+      .catch((error) => {
+        console.error('MongoDB connection failed:', error.message);
+        mongoConnectionPromise = null;
+        return false;
+      });
+  }
+
+  return mongoConnectionPromise;
 }
+
+void connectToMongo();
+
+// Serverless functions must await the initial database connection before reading or writing contacts.
+app.use(async (_req, _res, next) => {
+  await connectToMongo();
+  next();
+});
 
 app.post('/api/contact', async (req, res) => {
   const { name, email, message } = req.body || {};

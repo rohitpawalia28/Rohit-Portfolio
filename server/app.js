@@ -112,6 +112,20 @@ app.delete('/api/admin/contacts/:id', requireAdmin, async (req, res) => {
   }
 });
 
-app.get('/api/health', (_req, res) => res.json({ status: 'ok', database: mongoose.connection.readyState === 1 ? 'mongodb' : 'memory' }));
+app.get('/api/health', (_req, res) => {
+  const databaseConnected = mongoose.connection.readyState === 1;
+  const mongoState = databaseConnected
+    ? 'connected'
+    : process.env.MONGODB_URI
+      ? 'connection-failed'
+      : 'not-configured';
+
+  res.set('Cache-Control', 'no-store');
+  return res.json({
+    status: 'ok',
+    database: databaseConnected ? 'mongodb' : 'memory',
+    mongoState,
+  });
+});
 
 export default app;

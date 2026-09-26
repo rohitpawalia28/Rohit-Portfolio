@@ -187,6 +187,10 @@ function App() {
           <p>Currently studying Information Technology at Vellore Institute of Technology, I work across product interfaces, APIs, real-time features, and data-backed systems. My freelance projects have taken ideas from requirements to production.</p>
           <div className="facts">
             <div><strong>2023-2027</strong><span>B.Tech, IT at VIT Vellore</span></div>
+            <div><strong>2021</strong><span>Class 10, Navy Children School<br />Karanja, Navi Mumbai · 78.6%</span></div>
+            <div><strong>2023</strong><span>Class 12, PCM, Yaduvanshi Shiksha Niketan<br />Rewari, Haryana · 69%</span></div>
+          </div>
+          <div className="facts profile-highlights">
             <div><strong>2</strong><span>Paid freelance client builds</span></div>
             <div><strong>3</strong><span>Published patent applications</span></div>
           </div>

@@ -8,7 +8,6 @@ import {
   Cloud,
   Code2,
   Database,
-  Download,
   Github,
   Linkedin,
   MapPin,
@@ -61,6 +60,8 @@ const projects = [
     links: [{ label: 'Code', href: 'https://github.com/rohitpawalia28/entropy-zero-day-detection' }],
   },
 ];
+
+const resumeUrl = 'https://drive.google.com/file/d/1oLf2Ux5VZTBY8UTp43bLaod9pkY9X6Sh/view?usp=drive_link';
 
 const skillGroups = [
   ['Frontend', 'React', 'JavaScript', 'HTML5', 'CSS3'],
@@ -174,7 +175,7 @@ function App() {
           <motion.p className="hero-intro" variants={reveal}>Full-stack developer who turns complex workflows into useful, reliable software.</motion.p>
           <motion.div className="hero-actions" variants={reveal}>
             <a className="button primary" href="#work">Explore work <ArrowDownRight size={18} /></a>
-            <a className="button quiet" href="/Rohit_Resume.pdf" download>Resume <Download size={17} /></a>
+            <a className="button quiet" href={resumeUrl} target="_blank" rel="noreferrer">Resume</a>
           </motion.div>
         </motion.div>
         <div className="hero-footer"><span>VIT Vellore / Information Technology</span><span>Scroll to explore <ArrowDownRight size={15} /></span></div>
@@ -270,7 +271,7 @@ function App() {
             <p className="contact-location"><MapPin size={18} /> Gurugram, Haryana, India</p>
             <a href="https://www.linkedin.com/in/rohit-kumar-6a7b4134b/" target="_blank" rel="noreferrer"><Linkedin size={18} /> LinkedIn profile <ArrowUpRight size={15} /></a>
             <a href="https://github.com/rohitpawalia28" target="_blank" rel="noreferrer"><Github size={18} /> github.com/rohitpawalia28 <ArrowUpRight size={15} /></a>
-            <a href="/Rohit_Resume.pdf" download><Download size={18} /> Download resume</a>
+            <a href={resumeUrl} target="_blank" rel="noreferrer">View resume</a>
           </div>
         </div>
         <form onSubmit={sendMessage} className="contact-form">

@@ -75,7 +75,8 @@ function useLocalTime() {
 /* The live system graph                                               */
 /* ================================================================== */
 
-const COLORS = { ink: '#151B2E', cobalt: '#2F5BFF', packet: '#FFC83D', slate: '#6A7387', line: 'rgba(21,27,46,0.16)', paper: '#EDEFF3' };
+/* Night palette, matching the CSS tokens. `ink` is the text colour, `paper` the page. */
+const COLORS = { ink: '#E9EDF7', cobalt: '#7491FF', fill: '#3557F5', packet: '#FFC83D', slate: '#8089A3', line: 'rgba(233,237,247,0.14)', paper: '#0A0F1E', label: 'rgba(10,15,30,0.86)' };
 
 function SystemGraph({ onSelect, reduced }) {
   const canvasRef = useRef(null);
@@ -255,7 +256,7 @@ function SystemGraph({ onSelect, reduced }) {
         ctx.beginPath();
         ctx.moveTo(from.x, from.y);
         ctx.lineTo(to.x, to.y);
-        ctx.strokeStyle = active ? COLORS.cobalt : focus ? 'rgba(21,27,46,0.07)' : COLORS.line;
+        ctx.strokeStyle = active ? COLORS.cobalt : focus ? 'rgba(233,237,247,0.05)' : COLORS.line;
         ctx.lineWidth = active ? 1.6 : 1;
         ctx.stroke();
       });
@@ -268,11 +269,11 @@ function SystemGraph({ onSelect, reduced }) {
           const y = packet.from.y + (to.y - packet.from.y) * packet.t;
           ctx.beginPath();
           ctx.arc(x, y, 3.4, 0, Math.PI * 2);
+          ctx.shadowColor = 'rgba(255,200,61,0.9)';
+          ctx.shadowBlur = 12;
           ctx.fillStyle = COLORS.packet;
           ctx.fill();
-          ctx.lineWidth = 1.2;
-          ctx.strokeStyle = COLORS.ink;
-          ctx.stroke();
+          ctx.shadowBlur = 0;
         });
       }
 
@@ -287,13 +288,16 @@ function SystemGraph({ onSelect, reduced }) {
           const pulse = reduced ? 0 : (Math.sin(time / 700) + 1) * 3;
           ctx.beginPath();
           ctx.arc(node.x, node.y, 22 + pulse, 0, Math.PI * 2);
-          ctx.strokeStyle = 'rgba(47,91,255,0.35)';
+          ctx.strokeStyle = 'rgba(116,145,255,0.45)';
           ctx.lineWidth = 1;
           ctx.stroke();
           ctx.beginPath();
           ctx.arc(node.x, node.y, 14, 0, Math.PI * 2);
-          ctx.fillStyle = COLORS.cobalt;
+          ctx.shadowColor = 'rgba(83,116,255,0.95)';
+          ctx.shadowBlur = 30;
+          ctx.fillStyle = COLORS.fill;
           ctx.fill();
+          ctx.shadowBlur = 0;
           ctx.font = '650 15px "Bricolage Grotesque", sans-serif';
           ctx.fillStyle = COLORS.ink;
           ctx.textAlign = 'center';
@@ -308,7 +312,7 @@ function SystemGraph({ onSelect, reduced }) {
           ctx.textAlign = 'left';
           const textWidth = ctx.measureText(node.label).width;
           const lx = node.x + 16;
-          ctx.fillStyle = 'rgba(237,239,243,0.92)';
+          ctx.fillStyle = COLORS.label;
           ctx.fillRect(lx - 5, node.y - 12, textWidth + 10, 24);
           ctx.fillStyle = isFocus ? COLORS.cobalt : COLORS.ink;
           ctx.fillText(node.label, lx, node.y + 1);
@@ -527,9 +531,9 @@ function DotPortrait() {
       const sorted = [...lums].sort((m, n) => m - n);
       const lo = sorted[Math.floor(sorted.length * 0.03)];
       const hi = sorted[Math.floor(sorted.length * 0.9)];
-      ctx.fillStyle = '#DFE4EC';
+      ctx.fillStyle = '#5B7BFF';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#2F5BFF';
+      ctx.fillStyle = '#0A0F1E';
       for (let y = 0; y < rows; y += 1) {
         for (let x = 0; x < cols; x += 1) {
           const lum = lums[y * cols + x];

@@ -1,80 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-
-/* ================================================================== */
-/* Content                                                             */
-/* ================================================================== */
-
-const resumeUrl = 'https://drive.google.com/file/d/1oLf2Ux5VZTBY8UTp43bLaod9pkY9X6Sh/view?usp=drive_link';
-const linkedinUrl = 'https://www.linkedin.com/in/rohit-kumar-6a7b4134b/';
-const githubUrl = 'https://github.com/rohitpawalia28';
-const email = 'merohitk281205@gmail.com';
-const phone = '+91 8433787405';
-
-const projects = [
-  {
-    id: 'ace',
-    name: 'ACE Academy',
-    short: 'ACE Academy',
-    type: 'Institute management system',
-    year: '2026',
-    role: 'Paid client build',
-    description: 'A role-based platform for admins, teachers, and students. It handles attendance, timetables, marks, study materials, and progress tracking, with live updates over Socket.IO.',
-    stack: ['React', 'Node.js', 'MongoDB', 'Socket.IO'],
-    links: [{ label: 'Visit live site', href: 'https://achieverscentreofeducation.vercel.app/' }, { label: 'Read the code', href: 'https://github.com/rohitpawalia28/ACE-Academy' }],
-  },
-  {
-    id: 'salon',
-    name: 'Platinum Unisex Salon',
-    short: 'Platinum Salon',
-    type: 'Client management website',
-    year: '2026',
-    role: 'Paid client build',
-    description: 'A production site for a working salon: appointment booking, customer enquiries, service information, and an admin dashboard the owner uses to run the day.',
-    stack: ['JavaScript', 'MongoDB', 'CSS', 'JSON'],
-    links: [{ label: 'Visit live site', href: 'https://platinumunisexsalon.vercel.app/' }, { label: 'Read the code', href: 'https://github.com/platinumunisexsalon/Platinum-Unisex-Salon' }],
-  },
-  {
-    id: 'taxi',
-    name: 'Taxi Route Anomaly Detection',
-    short: 'Taxi anomalies',
-    type: 'Data engineering and ML',
-    year: '2025',
-    role: 'Academic project',
-    description: 'Route-level fare anomaly analysis across 32 GB of NYC taxi trips, processed with Spark and surfaced through a Flask dashboard.',
-    stack: ['PySpark', 'Pandas', 'Flask', 'Scikit-learn'],
-    links: [{ label: 'Read the code', href: 'https://github.com/rohitpawalia28/taxi-route-anomaly-detection' }],
-  },
-  {
-    id: 'ids',
-    name: 'Sentinel Entropy IDS',
-    short: 'Sentinel IDS',
-    type: 'Network security',
-    year: '2025',
-    role: 'Academic project',
-    description: 'Anomaly-based traffic analysis for CSV, PCAP, and PCAPNG captures, with protocol breakdowns, risk scoring, and watched ports.',
-    stack: ['Python', 'Flask', 'Scapy', 'Pandas'],
-    links: [{ label: 'Read the code', href: 'https://github.com/rohitpawalia28/entropy-zero-day-detection' }],
-  },
-];
-
-const patents = [
-  'Time-aware retrieval-augmented predictive behavioral risk scoring in cognitive care settings',
-  'Engagement-adaptive multimodal retrieval-augmented personalized reminiscence interaction',
-  'Epsilon-bound-verified fuzzy-rule surrogate modeling for interpretable LLM compression',
-];
-
-const toolkit = [
-  ['Interfaces', ['React', 'JavaScript', 'HTML', 'CSS']],
-  ['Servers', ['Node.js', 'Express', 'REST APIs', 'Socket.IO']],
-  ['Data', ['MongoDB', 'MySQL', 'PySpark', 'Pandas']],
-  ['Shipping', ['AWS', 'Vercel', 'Render', 'Git and CI/CD']],
-];
-
-const education = [
-  { years: '2023–2027', title: 'B.Tech in Information Technology', place: 'Vellore Institute of Technology' },
-  { years: '2023', title: 'Class 12, PCM', place: 'Yaduvanshi Shiksha Niketan, Rewari' },
-  { years: '2021', title: 'Class 10', place: 'Navy Children School, Karanja, Navi Mumbai' },
-];
+import { education, email, githubUrl, linkedinUrl, patents, phone, projects, resumeUrl, toolkit } from './content';
+import { FlowDiagram, ProcessStory, RouteRail, ScrollBand, Sweep, Terminal } from './sections';
 
 /* Graph: me → projects → the tools each one was built with. */
 const graphNodes = [
@@ -513,7 +439,7 @@ function SystemGraph({ onSelect, reduced }) {
 /* Name that responds to the cursor through variable-font axes         */
 /* ================================================================== */
 
-function ReactiveName({ lines, sectionRef, reduced }) {
+function ReactiveName({ lines, sectionRef, reduced, as: Tag = 'h1', className = '' }) {
   const ref = useRef(null);
 
   useEffect(() => {
@@ -554,16 +480,16 @@ function ReactiveName({ lines, sectionRef, reduced }) {
 
   let count = 0;
   return (
-    <h1 ref={ref} className="name" aria-label={lines.join(' ')}>
+    <Tag ref={ref} className={`name ${className}`} aria-label={lines.join(' ')}>
       {lines.map((line) => (
         <span className="name-line" key={line} aria-hidden="true">
           {line.split('').map((char) => {
             count += 1;
-            return <span className="letter" key={count} style={{ '--i': count }}>{char}</span>;
+            return <span className="letter" key={count} style={{ '--i': count }}>{char === ' ' ? '\u00A0' : char}</span>;
           })}
         </span>
       ))}
-    </h1>
+    </Tag>
   );
 }
 
@@ -713,6 +639,7 @@ function Nav({ onOpenPalette }) {
       <a className="nav-name" href="#top" onClick={close}>Rohit Kumar</a>
       <nav className="nav-links" aria-label="Main">
         <a href="#work" onClick={close}>Work</a>
+        <a href="#process" onClick={close}>Process</a>
         <a href="#about" onClick={close}>About</a>
         <a href="#research" onClick={close}>Research</a>
         <a href="#contact" onClick={close}>Contact</a>
@@ -748,6 +675,10 @@ function Hero({ onSelect, reduced }) {
           <div><dt>Based in</dt><dd>Gurugram, India</dd></div>
           <div><dt>Local time</dt><dd>{time} IST</dd></div>
         </dl>
+        <a className="scroll-cue" href="#work" aria-label="Scroll to the work">
+          <span className="scroll-cue-line" aria-hidden="true"><i /></span>
+          <span>Follow the route</span>
+        </a>
         <p className="graph-hint">
           <span className="packet-key" aria-hidden="true" />
           <span>Everything I&rsquo;ve built, wired to the tools behind it. <span className="hint-pointer">Drag a node, or click a project to open it.</span><span className="hint-touch">Tap a project to open it.</span></span>
@@ -761,7 +692,7 @@ function Work({ openId, setOpenId }) {
   return (
     <section className="work" id="work">
       <header className="section-head">
-        <h2>Selected work</h2>
+        <Sweep>Selected work</Sweep>
         <p>Two paid client systems running in production, and two data and security projects built at VIT.</p>
       </header>
       <ul className="cases">
@@ -777,7 +708,10 @@ function Work({ openId, setOpenId }) {
               </button>
               <div className="case-body" id={`case-body-${project.id}`} role="region" aria-label={project.name} inert={!open}>
                 <div className="case-inner">
-                  <p className="case-description">{project.description}</p>
+                  <div className="case-main">
+                    <p className="case-description">{project.description}</p>
+                    <FlowDiagram flow={project.flow} />
+                  </div>
                   <div className="case-meta">
                     <p className="case-role">{project.role}</p>
                     <ul className="case-stack">{project.stack.map((item) => <li key={item}>{item}</li>)}</ul>
@@ -802,7 +736,7 @@ function About() {
     <section className="about" id="about">
       <DotPortrait />
       <div className="about-copy">
-        <h2>I like the part where a requirement turns into something people use every day.</h2>
+        <Sweep>I like the part where a requirement turns into something people use every day.</Sweep>
         <p>I&rsquo;m a final-year Information Technology student at VIT Vellore. From March to June 2026 I worked freelance and shipped two paid client systems, from the first requirements call through MongoDB, admin workflows, and production deploys.</p>
         <p>I&rsquo;m also a co-inventor on three published Indian patent applications in applied AI. That work is where my habit of asking &ldquo;how would we know this works?&rdquo; comes from.</p>
 
@@ -833,7 +767,7 @@ function Research() {
   return (
     <section className="research" id="research">
       <header className="section-head">
-        <h2>Research</h2>
+        <Sweep>Research</Sweep>
         <p>Co-inventor on three published Indian patent applications exploring adaptive AI, behavioral risk analysis, and interpretable language models.</p>
       </header>
       <ul className="patents">
@@ -845,7 +779,7 @@ function Research() {
         ))}
       </ul>
       <div className="experience">
-        <h2>Experience</h2>
+        <Sweep>Experience</Sweep>
         <div className="experience-row">
           <p className="experience-when">Mar – Jun 2026</p>
           <div>
@@ -894,7 +828,7 @@ function Contact() {
   return (
     <section className="contact" id="contact">
       <div className="contact-intro">
-        <h2>Tell me what you&rsquo;re building.</h2>
+        <Sweep>Tell me what you’re building.</Sweep>
         <p>A product, a role, or a problem that needs a working system. I usually reply within a day.</p>
         <ul className="contact-links">
           <li><button onClick={copyEmail}>{Icon.mail}<span>{copied ? 'Email address copied' : email}</span></button></li>
@@ -931,14 +865,33 @@ function Contact() {
   );
 }
 
-function Footer() {
+function Footer({ reduced }) {
+  const ref = useRef(null);
+  const [state, setState] = useState('idle');
+  useEffect(() => {
+    if (reduced) return undefined;
+    setState('ready');
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { setState('in'); observer.disconnect(); }
+    }, { threshold: 0.35 });
+    observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [reduced]);
+
   return (
-    <footer className="footer">
-      <p>Rohit Kumar, {new Date().getFullYear()}. Designed and built by hand.</p>
-      <div>
-        <a href={githubUrl} target="_blank" rel="noreferrer" aria-label="GitHub">{Icon.github}</a>
-        <a href={linkedinUrl} target="_blank" rel="noreferrer" aria-label="LinkedIn">{Icon.linkedin}</a>
-        <a href="#top">Back to top</a>
+    <footer className={`footer is-${state}`} ref={ref}>
+      <div className="footer-top">
+        <p className="footer-end"><span className="packet-key" aria-hidden="true" />You reached the end of the route. Thanks for reading all of it.</p>
+        <a className="button button-primary" href="#contact">Start a conversation</a>
+      </div>
+      <ReactiveName as="p" className="footer-name" lines={['Rohit Kumar']} sectionRef={ref} reduced={reduced} />
+      <div className="footer-row">
+        <p>Rohit Kumar, {new Date().getFullYear()}. Designed and built by hand.</p>
+        <div>
+          <a href={githubUrl} target="_blank" rel="noreferrer" aria-label="GitHub">{Icon.github}</a>
+          <a href={linkedinUrl} target="_blank" rel="noreferrer" aria-label="LinkedIn">{Icon.linkedin}</a>
+          <a href="#top">Back to top</a>
+        </div>
       </div>
     </footer>
   );
@@ -965,7 +918,9 @@ function App() {
 
   const actions = useMemo(() => [
     ...projects.map((project) => ({ label: project.name, hint: project.type, run: () => openProject(project.id) })),
+    { label: 'How I ship', hint: 'Five-step process', run: () => goTo('#process') },
     { label: 'About', hint: 'Background and education', run: () => goTo('#about') },
+    { label: 'Terminal', hint: 'Type commands', run: () => goTo('#terminal') },
     { label: 'Research', hint: 'Patent applications', run: () => goTo('#research') },
     { label: 'Contact', hint: 'Send a message', run: () => goTo('#contact') },
     { label: 'Résumé', hint: 'Opens in a new tab', run: () => window.open(resumeUrl, '_blank', 'noopener') },
@@ -989,14 +944,18 @@ function App() {
     <>
       <a className="skip" href="#work">Skip to work</a>
       <Nav onOpenPalette={() => setPaletteOpen(true)} />
+      <RouteRail />
       <main>
         <Hero onSelect={openProject} reduced={reduced} />
+        <ScrollBand />
         <Work openId={openId} setOpenId={setOpenId} />
+        <ProcessStory />
         <About />
         <Research />
+        <Terminal onOpenProject={openProject} onGoTo={goTo} />
         <Contact />
       </main>
-      <Footer />
+      <Footer reduced={reduced} />
       <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} actions={actions} />
     </>
   );

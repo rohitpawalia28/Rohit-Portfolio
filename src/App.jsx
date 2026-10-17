@@ -1,102 +1,60 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  AnimatePresence,
-  animate,
-  motion,
-  useInView,
-  useMotionValue,
-  useMotionValueEvent,
-  useReducedMotion,
-  useScroll,
-  useSpring,
-  useTransform,
-} from 'framer-motion';
-import {
-  ArrowDown,
-  ArrowUp,
-  ArrowUpRight,
-  AtSign,
-  Cloud,
-  Code2,
-  Database,
-  Github,
-  Linkedin,
-  MapPin,
-  Phone,
-  Send,
-  ShieldCheck,
-} from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-/* ------------------------------------------------------------------ */
+/* ================================================================== */
 /* Content                                                             */
-/* ------------------------------------------------------------------ */
+/* ================================================================== */
 
 const resumeUrl = 'https://drive.google.com/file/d/1oLf2Ux5VZTBY8UTp43bLaod9pkY9X6Sh/view?usp=drive_link';
 const linkedinUrl = 'https://www.linkedin.com/in/rohit-kumar-6a7b4134b/';
 const githubUrl = 'https://github.com/rohitpawalia28';
 const email = 'merohitk281205@gmail.com';
+const phone = '+91 8433787405';
 
 const projects = [
   {
-    number: '01',
+    id: 'ace',
     name: 'ACE Academy',
-    type: 'Institute Management System',
+    short: 'ACE Academy',
+    type: 'Institute management system',
     year: '2026',
-    description: 'A role-based platform for Admins, Teachers, and Students with attendance, timetables, marks, materials, and progress tracking.',
+    role: 'Paid client build',
+    description: 'A role-based platform for admins, teachers, and students. It handles attendance, timetables, marks, study materials, and progress tracking, with live updates over Socket.IO.',
     stack: ['React', 'Node.js', 'MongoDB', 'Socket.IO'],
-    focus: 'Multi-role operations',
-    tone: 'tone-a',
-    links: [{ label: 'Live site', href: 'https://achieverscentreofeducation.vercel.app/' }, { label: 'Code', href: 'https://github.com/rohitpawalia28/ACE-Academy' }],
+    links: [{ label: 'Visit live site', href: 'https://achieverscentreofeducation.vercel.app/' }, { label: 'Read the code', href: 'https://github.com/rohitpawalia28/ACE-Academy' }],
   },
   {
-    number: '02',
+    id: 'salon',
     name: 'Platinum Unisex Salon',
-    type: 'Client Management Website',
+    short: 'Platinum Salon',
+    type: 'Client management website',
     year: '2026',
-    description: 'A production client platform for appointment booking, customer enquiries, service information, and an admin operations dashboard.',
+    role: 'Paid client build',
+    description: 'A production site for a working salon: appointment booking, customer enquiries, service information, and an admin dashboard the owner uses to run the day.',
     stack: ['JavaScript', 'MongoDB', 'CSS', 'JSON'],
-    focus: 'Customer conversion flow',
-    tone: 'tone-b',
-    links: [{ label: 'Live site', href: 'https://platinumunisexsalon.vercel.app/' }, { label: 'Code', href: 'https://github.com/platinumunisexsalon/Platinum-Unisex-Salon' }],
+    links: [{ label: 'Visit live site', href: 'https://platinumunisexsalon.vercel.app/' }, { label: 'Read the code', href: 'https://github.com/platinumunisexsalon/Platinum-Unisex-Salon' }],
   },
   {
-    number: '03',
+    id: 'taxi',
     name: 'Taxi Route Anomaly Detection',
-    type: 'Data Engineering + ML',
+    short: 'Taxi anomalies',
+    type: 'Data engineering and ML',
     year: '2025',
-    description: 'Route-level fare anomaly analysis over a 32 GB NYC Taxi dataset, processed with Spark and surfaced through a Flask dashboard.',
+    role: 'Academic project',
+    description: 'Route-level fare anomaly analysis across 32 GB of NYC taxi trips, processed with Spark and surfaced through a Flask dashboard.',
     stack: ['PySpark', 'Pandas', 'Flask', 'Scikit-learn'],
-    focus: '32 GB data analysis',
-    tone: 'tone-c',
-    links: [{ label: 'Code', href: 'https://github.com/rohitpawalia28/taxi-route-anomaly-detection' }],
+    links: [{ label: 'Read the code', href: 'https://github.com/rohitpawalia28/taxi-route-anomaly-detection' }],
   },
   {
-    number: '04',
+    id: 'ids',
     name: 'Sentinel Entropy IDS',
-    type: 'Network Security',
+    short: 'Sentinel IDS',
+    type: 'Network security',
     year: '2025',
-    description: 'Anomaly-based traffic analysis for CSV, PCAP, and PCAPNG files, with protocol insights, risk scoring, and watched ports.',
+    role: 'Academic project',
+    description: 'Anomaly-based traffic analysis for CSV, PCAP, and PCAPNG captures, with protocol breakdowns, risk scoring, and watched ports.',
     stack: ['Python', 'Flask', 'Scapy', 'Pandas'],
-    focus: 'Network threat signals',
-    tone: 'tone-d',
-    links: [{ label: 'Code', href: 'https://github.com/rohitpawalia28/entropy-zero-day-detection' }],
+    links: [{ label: 'Read the code', href: 'https://github.com/rohitpawalia28/entropy-zero-day-detection' }],
   },
-];
-
-const skillGroups = [
-  ['Frontend', 'React', 'JavaScript', 'HTML5', 'CSS3'],
-  ['Backend', 'Node.js', 'Express.js', 'REST APIs', 'Socket.IO'],
-  ['Data', 'MongoDB', 'MySQL', 'PySpark', 'Pandas'],
-  ['Cloud', 'AWS', 'Vercel', 'Render', 'CI/CD'],
-];
-
-const marqueeItems = ['React', 'Node.js', 'Express', 'MongoDB', 'Socket.IO', 'MySQL', 'PySpark', 'AWS', 'Vercel', 'REST APIs'];
-
-const capabilities = [
-  { icon: Code2, label: 'Product development', text: 'Interfaces and backend flows that make complicated work feel direct.' },
-  { icon: Database, label: 'Data-backed systems', text: 'MongoDB, MySQL, APIs, and operational dashboards built around real workflows.' },
-  { icon: Cloud, label: 'Production delivery', text: 'Practical deployment with AWS, Vercel, Render, Git, and CI/CD.' },
-  { icon: ShieldCheck, label: 'Security-minded builds', text: 'Research-led thinking for robust, observable, and safer applications.' },
 ];
 
 const patents = [
@@ -105,534 +63,767 @@ const patents = [
   'Epsilon-bound-verified fuzzy-rule surrogate modeling for interpretable LLM compression',
 ];
 
+const toolkit = [
+  ['Interfaces', ['React', 'JavaScript', 'HTML', 'CSS']],
+  ['Servers', ['Node.js', 'Express', 'REST APIs', 'Socket.IO']],
+  ['Data', ['MongoDB', 'MySQL', 'PySpark', 'Pandas']],
+  ['Shipping', ['AWS', 'Vercel', 'Render', 'Git and CI/CD']],
+];
+
 const education = [
-  { year: '2023 — 2027', title: 'B.Tech, Information Technology', place: 'Vellore Institute of Technology, Vellore' },
-  { year: '2023', title: 'Class 12, PCM', place: 'Yaduvanshi Shiksha Niketan, Rewari, Haryana' },
-  { year: '2021', title: 'Class 10', place: 'Navy Children School, Karanja, Navi Mumbai' },
+  { years: '2023–2027', title: 'B.Tech in Information Technology', place: 'Vellore Institute of Technology' },
+  { years: '2023', title: 'Class 12, PCM', place: 'Yaduvanshi Shiksha Niketan, Rewari' },
+  { years: '2021', title: 'Class 10', place: 'Navy Children School, Karanja, Navi Mumbai' },
 ];
 
-const navItems = [
-  { label: 'About', href: '#about' },
-  { label: 'Work', href: '#work' },
-  { label: 'Research', href: '#research' },
-  { label: 'Contact', href: '#contact' },
+/* Graph: me → projects → the tools each one was built with. */
+const graphNodes = [
+  { id: 'me', label: 'Rohit', kind: 'core' },
+  ...projects.map((project) => ({ id: project.id, label: project.short, kind: 'project' })),
+  { id: 'patents', label: '3 patents', kind: 'project', target: 'research' },
+  ...['React', 'Node.js', 'MongoDB', 'Socket.IO', 'Express', 'JavaScript', 'PySpark', 'Pandas', 'Flask', 'Scikit-learn', 'Python', 'Scapy', 'Applied AI', 'AWS', 'Vercel']
+    .map((label) => ({ id: label, label, kind: 'skill' })),
 ];
 
-const ease = [0.22, 1, 0.36, 1];
+const graphEdges = [
+  ['me', 'ace'], ['me', 'salon'], ['me', 'taxi'], ['me', 'ids'], ['me', 'patents'],
+  ['ace', 'React'], ['ace', 'Node.js'], ['ace', 'MongoDB'], ['ace', 'Socket.IO'],
+  ['salon', 'JavaScript'], ['salon', 'MongoDB'], ['salon', 'Node.js'],
+  ['taxi', 'PySpark'], ['taxi', 'Pandas'], ['taxi', 'Flask'], ['taxi', 'Scikit-learn'],
+  ['ids', 'Python'], ['ids', 'Flask'], ['ids', 'Scapy'], ['ids', 'Pandas'],
+  ['patents', 'Applied AI'], ['patents', 'Python'],
+  ['Node.js', 'Express'], ['me', 'AWS'], ['me', 'Vercel'],
+];
 
-/* ------------------------------------------------------------------ */
-/* Small animation building blocks                                     */
-/* ------------------------------------------------------------------ */
+/* ================================================================== */
+/* Icons (inline, so the page has no icon dependency)                  */
+/* ================================================================== */
 
-function useIsWide(query = '(min-width: 861px)') {
-  const [wide, setWide] = useState(() => (typeof window === 'undefined' ? true : window.matchMedia(query).matches));
-  useEffect(() => {
-    const media = window.matchMedia(query);
-    const update = () => setWide(media.matches);
-    media.addEventListener('change', update);
-    return () => media.removeEventListener('change', update);
-  }, [query]);
-  return wide;
-}
-
-/** Text that rises out of a mask, line by line. */
-function MaskLines({ lines, className = '', delay = 0, play = true, as: Tag = 'h2' }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, amount: 0.4 });
-  const show = play && inView;
-  return (
-    <Tag ref={ref} className={`mask-lines ${className}`}>
-      {lines.map((line, index) => (
-        <span className="mask-line" key={index}>
-          <motion.span
-            initial={{ y: '110%' }}
-            animate={show ? { y: '0%' } : { y: '110%' }}
-            transition={{ duration: 1.05, ease, delay: delay + index * 0.09 }}
-          >
-            {line}
-          </motion.span>
-        </span>
-      ))}
-    </Tag>
-  );
-}
-
-/** Generic fade-and-rise on scroll. */
-function Reveal({ children, delay = 0, y = 28, className = '', as = 'div' }) {
-  const Component = motion[as];
-  return (
-    <Component
-      className={className}
-      initial={{ opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.25 }}
-      transition={{ duration: 0.9, ease, delay }}
-    >
-      {children}
-    </Component>
-  );
-}
-
-/** Pulls its child toward the pointer. */
-function Magnetic({ children, strength = 0.3 }) {
-  const ref = useRef(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const springX = useSpring(x, { stiffness: 180, damping: 14, mass: 0.4 });
-  const springY = useSpring(y, { stiffness: 180, damping: 14, mass: 0.4 });
-
-  const onMove = (event) => {
-    const rect = ref.current.getBoundingClientRect();
-    x.set((event.clientX - (rect.left + rect.width / 2)) * strength);
-    y.set((event.clientY - (rect.top + rect.height / 2)) * strength);
-  };
-  const reset = () => { x.set(0); y.set(0); };
-
-  return (
-    <motion.span ref={ref} className="magnetic" style={{ x: springX, y: springY }} onPointerMove={onMove} onPointerLeave={reset}>
-      {children}
-    </motion.span>
-  );
-}
-
-/** Link whose label rolls up to a second copy on hover. */
-function RollText({ children }) {
-  return (
-    <span className="roll" data-text={children}>
-      <span>{children}</span>
-    </span>
-  );
-}
-
-/** Number that counts up when it scrolls into view. */
-function CountUp({ to, suffix = '' }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, amount: 0.6 });
-  const [value, setValue] = useState(0);
-  useEffect(() => {
-    if (!inView) return undefined;
-    const controls = animate(0, to, { duration: 1.6, ease, onUpdate: (latest) => setValue(Math.round(latest)) });
-    return () => controls.stop();
-  }, [inView, to]);
-  return <span ref={ref}>{value}{suffix}</span>;
-}
-
-/** Words light up one by one as the paragraph passes through the viewport. */
-function ScrollWords({ text }) {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 0.85', 'end 0.5'] });
-  const words = text.split(' ');
-  return (
-    <p ref={ref} className="statement">
-      {words.map((word, index) => (
-        <Word key={index} progress={scrollYProgress} range={[index / words.length, (index + 1) / words.length]}>
-          {word}
-        </Word>
-      ))}
-    </p>
-  );
-}
-
-function Word({ children, progress, range }) {
-  const opacity = useTransform(progress, range, [0.14, 1]);
-  return (
-    <>
-      <motion.span style={{ opacity }}>{children}</motion.span>{' '}
-    </>
-  );
-}
-
-/** Tracks the pointer inside an element via CSS variables for spotlight effects. */
-const trackSpotlight = (event) => {
-  const rect = event.currentTarget.getBoundingClientRect();
-  event.currentTarget.style.setProperty('--mx', `${event.clientX - rect.left}px`);
-  event.currentTarget.style.setProperty('--my', `${event.clientY - rect.top}px`);
+const Icon = {
+  external: (
+    <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M5 3h8v8M13 3 3 13" fill="none" stroke="currentColor" strokeWidth="1.7" /></svg>
+  ),
+  github: (
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5a11.5 11.5 0 0 0-3.64 22.4c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.37-3.87-1.37-.53-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.08-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.8 1.19 1.82 1.19 3.08 0 4.41-2.69 5.38-5.26 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z" /></svg>
+  ),
+  linkedin: (
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0Z" /></svg>
+  ),
+  mail: (
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 5h18v14H3z M3 6l9 7 9-7" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" /></svg>
+  ),
+  phone: (
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M5 3h4l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" /></svg>
+  ),
+  search: (
+    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" strokeWidth="1.8" /><path d="m16 16 4.5 4.5" stroke="currentColor" strokeWidth="1.8" /></svg>
+  ),
 };
 
-/* ------------------------------------------------------------------ */
-/* Sections                                                            */
-/* ------------------------------------------------------------------ */
+/* ================================================================== */
+/* Hooks                                                               */
+/* ================================================================== */
 
-function Preloader({ onDone }) {
-  const [count, setCount] = useState(0);
+function useReducedMotion() {
+  const [reduced, setReduced] = useState(() => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   useEffect(() => {
-    const controls = animate(0, 100, {
-      duration: 1.5,
-      ease: [0.65, 0, 0.35, 1],
-      onUpdate: (latest) => setCount(Math.round(latest)),
-      onComplete: () => setTimeout(onDone, 250),
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => setReduced(media.matches);
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
+  return reduced;
+}
+
+function useLocalTime() {
+  const format = () => new Intl.DateTimeFormat('en-IN', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' }).format(new Date());
+  const [time, setTime] = useState(format);
+  useEffect(() => {
+    const id = setInterval(() => setTime(format()), 20000);
+    return () => clearInterval(id);
+  }, []);
+  return time;
+}
+
+/* ================================================================== */
+/* The live system graph                                               */
+/* ================================================================== */
+
+const COLORS = { ink: '#151B2E', cobalt: '#2F5BFF', packet: '#FFC83D', slate: '#6A7387', line: 'rgba(21,27,46,0.16)', paper: '#EDEFF3' };
+
+function SystemGraph({ onSelect, reduced }) {
+  const canvasRef = useRef(null);
+  const selectRef = useRef(onSelect);
+  selectRef.current = onSelect;
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    let width = 0;
+    let height = 0;
+    let scale = 1;
+    let wide = true;
+    let frame = 0;
+    let running = true;
+    let visible = true;
+
+    const index = new Map();
+    const nodes = graphNodes.map((node, i) => {
+      const item = { ...node, x: 0, y: 0, vx: 0, vy: 0, i, born: 0, lw: node.label.length * (node.kind === 'project' ? 9 : 7.2) };
+      index.set(node.id, item);
+      return item;
     });
-    return () => controls.stop();
-  }, [onDone]);
+    const edges = graphEdges.map(([a, b]) => ({ a: index.get(a), b: index.get(b) }));
+    const neighbours = new Map(nodes.map((node) => [node, new Set()]));
+    edges.forEach(({ a, b }) => { neighbours.get(a).add(b); neighbours.get(b).add(a); });
+    const edgesOf = new Map(nodes.map((node) => [node, edges.filter((edge) => edge.a === node || edge.b === node)]));
 
-  return (
-    <motion.div className="preloader" exit={{ y: '-100%' }} transition={{ duration: 1, ease: [0.76, 0, 0.24, 1] }}>
-      <div className="preloader-name">
-        {'Rohit Kumar'.split('').map((char, index) => (
-          <span className="mask-line" key={index}>
-            <motion.span initial={{ y: '110%' }} animate={{ y: '0%' }} transition={{ duration: 0.8, ease, delay: 0.1 + index * 0.04 }}>
-              {char === ' ' ? ' ' : char}
-            </motion.span>
-          </span>
-        ))}
-      </div>
-      <div className="preloader-bar"><motion.i style={{ scaleX: count / 100 }} /></div>
-      <span className="preloader-count">{String(count).padStart(3, '0')}</span>
-    </motion.div>
-  );
-}
+    const pointer = { x: -999, y: -999, inside: false };
+    let hovered = null;
+    let dragging = null;
+    let downAt = null;
 
-function Cursor({ label }) {
-  const x = useMotionValue(-100);
-  const y = useMotionValue(-100);
-  const smoothX = useSpring(x, { damping: 26, stiffness: 380, mass: 0.4 });
-  const smoothY = useSpring(y, { damping: 26, stiffness: 380, mass: 0.4 });
-  const [hovering, setHovering] = useState(false);
+    const anchor = () => (wide ? { x: width * 0.68, y: height * 0.47 } : { x: width * 0.5, y: height * 0.5 });
 
-  useEffect(() => {
-    const move = (event) => {
-      x.set(event.clientX);
-      y.set(event.clientY);
-      setHovering(Boolean(event.target.closest?.('a, button, input, textarea, [data-cursor]')));
+    const seed = () => {
+      const a = anchor();
+      nodes.forEach((node, i) => {
+        const angle = (i / nodes.length) * Math.PI * 2;
+        node.x = a.x + Math.cos(angle) * 6;
+        node.y = a.y + Math.sin(angle) * 6;
+        node.vx = Math.cos(angle) * (node.kind === 'skill' ? 9 : 6);
+        node.vy = Math.sin(angle) * (node.kind === 'skill' ? 9 : 6);
+        node.born = node.kind === 'core' ? 0 : node.kind === 'project' ? 10 : 22 + i * 1.5;
+      });
     };
-    window.addEventListener('pointermove', move);
-    return () => window.removeEventListener('pointermove', move);
-  }, [x, y]);
 
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const firstRun = width === 0;
+      width = rect.width;
+      height = rect.height;
+      wide = width > 860;
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const room = wide ? Math.min(width * 0.6, height) : Math.min(width, height);
+      scale = Math.max(0.5, Math.min(1.15, room / 640));
+      measure();
+      if (firstRun) seed();
+    };
+
+    /* Packets travel edge to edge, like messages moving through the system. */
+    const packets = Array.from({ length: 9 }, (_, i) => {
+      const edge = edges[(i * 5) % edges.length];
+      return { edge, from: edge.a, t: Math.random(), speed: 0.006 + Math.random() * 0.006 };
+    });
+
+    const bounds = () => {
+      const left = wide ? width * 0.36 : 24;
+      return { left, right: width - 30, top: wide ? 96 : 24, bottom: height - (wide ? 120 : 30) };
+    };
+
+    const step = () => {
+      const a = anchor();
+      const box = bounds();
+      const rest = { project: 165 * scale, skill: 88 * scale };
+
+      for (let i = 0; i < nodes.length; i += 1) {
+        const n1 = nodes[i];
+        for (let j = i + 1; j < nodes.length; j += 1) {
+          const n2 = nodes[j];
+          let dx = n2.x - n1.x;
+          let dy = n2.y - n1.y;
+          let d2 = dx * dx + dy * dy;
+          if (d2 < 1) { dx = Math.random() - 0.5; dy = Math.random() - 0.5; d2 = 1; }
+          const force = Math.min((2600 * scale * scale) / d2, 6);
+          const d = Math.sqrt(d2);
+          const fx = (dx / d) * force;
+          const fy = (dy / d) * force;
+          n1.vx -= fx; n1.vy -= fy;
+          n2.vx += fx; n2.vy += fy;
+        }
+      }
+
+      edges.forEach(({ a: from, b: to }) => {
+        const target = to.kind !== 'skill' ? rest.project : from.kind === 'core' ? rest.skill * 1.9 : rest.skill;
+        const dx = to.x - from.x;
+        const dy = to.y - from.y;
+        const d = Math.sqrt(dx * dx + dy * dy) || 1;
+        const pull = (d - target) * 0.012;
+        const fx = (dx / d) * pull;
+        const fy = (dy / d) * pull;
+        from.vx += fx; from.vy += fy;
+        to.vx -= fx; to.vy -= fy;
+      });
+
+      /* keep labels from sitting on top of each other */
+      const boxOf = (node) => {
+        if (node.kind === 'core') return [node.x - 26, node.y - 26, node.x + 26, node.y + 52];
+        if (node.kind === 'project') return [node.x - 12, node.y - 14, node.x + 22 + node.lw, node.y + 14];
+        return [node.x - 8, node.y - 10, node.x + 14 + node.lw, node.y + 10];
+      };
+      for (let i = 0; i < nodes.length; i += 1) {
+        const b1 = boxOf(nodes[i]);
+        for (let j = i + 1; j < nodes.length; j += 1) {
+          const b2 = boxOf(nodes[j]);
+          const ox = Math.min(b1[2], b2[2]) - Math.max(b1[0], b2[0]);
+          const oy = Math.min(b1[3], b2[3]) - Math.max(b1[1], b2[1]);
+          if (ox <= 0 || oy <= 0) continue;
+          const n1 = nodes[i];
+          const n2 = nodes[j];
+          if (oy < ox) {
+            const dir = n2.y >= n1.y ? 1 : -1;
+            n1.vy -= dir * oy * 0.12; n2.vy += dir * oy * 0.12;
+          } else {
+            const dir = n2.x >= n1.x ? 1 : -1;
+            n1.vx -= dir * ox * 0.08; n2.vx += dir * ox * 0.08;
+          }
+        }
+      }
+
+      nodes.forEach((node) => {
+        const gravity = node.kind === 'core' ? 0.06 : 0.0025;
+        node.vx += (a.x - node.x) * gravity;
+        node.vy += (a.y - node.y) * gravity;
+
+        if (pointer.inside && !dragging && node.kind === 'skill' && node !== hovered) {
+          const dx = node.x - pointer.x;
+          const dy = node.y - pointer.y;
+          const d2 = dx * dx + dy * dy;
+          if (d2 < 12000) {
+            const d = Math.sqrt(d2 + 1);
+            node.vx += (dx / d) * 0.3;
+            node.vy += (dy / d) * 0.3;
+          }
+        }
+
+        if (node === dragging) {
+          node.x += (pointer.x - node.x) * 0.35;
+          node.y += (pointer.y - node.y) * 0.35;
+          node.vx = 0; node.vy = 0;
+          return;
+        }
+        node.vx *= 0.82;
+        node.vy *= 0.82;
+        node.x += node.vx;
+        node.y += node.vy;
+        const labelRoom = node.kind === 'core' ? 0 : node.lw + 20;
+        node.x = Math.max(box.left, Math.min(box.right - labelRoom, node.x));
+        node.y = Math.max(box.top, Math.min(box.bottom, node.y));
+      });
+    };
+
+    const draw = (time) => {
+      ctx.clearRect(0, 0, width, height);
+      const focus = hovered || dragging;
+      const lit = focus ? neighbours.get(focus) : null;
+
+      edges.forEach(({ a: from, b: to }) => {
+        const appear = Math.min(1, Math.max(0, (frame - Math.max(from.born, to.born)) / 30));
+        if (appear <= 0) return;
+        const active = focus && (from === focus || to === focus);
+        ctx.globalAlpha = appear;
+        ctx.beginPath();
+        ctx.moveTo(from.x, from.y);
+        ctx.lineTo(to.x, to.y);
+        ctx.strokeStyle = active ? COLORS.cobalt : focus ? 'rgba(21,27,46,0.07)' : COLORS.line;
+        ctx.lineWidth = active ? 1.6 : 1;
+        ctx.stroke();
+      });
+      ctx.globalAlpha = 1;
+
+      if (!reduced && frame > 70) {
+        packets.forEach((packet) => {
+          const to = packet.edge.a === packet.from ? packet.edge.b : packet.edge.a;
+          const x = packet.from.x + (to.x - packet.from.x) * packet.t;
+          const y = packet.from.y + (to.y - packet.from.y) * packet.t;
+          ctx.beginPath();
+          ctx.arc(x, y, 3.4, 0, Math.PI * 2);
+          ctx.fillStyle = COLORS.packet;
+          ctx.fill();
+          ctx.lineWidth = 1.2;
+          ctx.strokeStyle = COLORS.ink;
+          ctx.stroke();
+        });
+      }
+
+      ctx.textBaseline = 'middle';
+      nodes.forEach((node) => {
+        const age = Math.min(1, Math.max(0, (frame - node.born) / 30));
+        if (age <= 0) return;
+        const dimmed = focus && node !== focus && !lit.has(node);
+        ctx.globalAlpha = (dimmed ? 0.25 : 1) * age;
+
+        if (node.kind === 'core') {
+          const pulse = reduced ? 0 : (Math.sin(time / 700) + 1) * 3;
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, 22 + pulse, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(47,91,255,0.35)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, 14, 0, Math.PI * 2);
+          ctx.fillStyle = COLORS.cobalt;
+          ctx.fill();
+          ctx.font = '650 15px "Bricolage Grotesque", sans-serif';
+          ctx.fillStyle = COLORS.ink;
+          ctx.textAlign = 'center';
+          ctx.fillText(node.label, node.x, node.y + 40);
+        } else if (node.kind === 'project') {
+          const isFocus = node === focus;
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, isFocus ? 10 : 8, 0, Math.PI * 2);
+          ctx.fillStyle = isFocus ? COLORS.cobalt : COLORS.ink;
+          ctx.fill();
+          ctx.font = `${isFocus ? 750 : 620} ${Math.round(15 * Math.max(scale, 0.88))}px "Bricolage Grotesque", sans-serif`;
+          ctx.textAlign = 'left';
+          const textWidth = ctx.measureText(node.label).width;
+          const lx = node.x + 16;
+          ctx.fillStyle = 'rgba(237,239,243,0.92)';
+          ctx.fillRect(lx - 5, node.y - 12, textWidth + 10, 24);
+          ctx.fillStyle = isFocus ? COLORS.cobalt : COLORS.ink;
+          ctx.fillText(node.label, lx, node.y + 1);
+        } else {
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, 4.5, 0, Math.PI * 2);
+          ctx.fillStyle = COLORS.paper;
+          ctx.fill();
+          ctx.lineWidth = 1.4;
+          ctx.strokeStyle = node === focus ? COLORS.cobalt : COLORS.slate;
+          ctx.stroke();
+          ctx.font = `500 ${Math.round(12.5 * Math.max(scale, 0.9))}px "Bricolage Grotesque", sans-serif`;
+          ctx.fillStyle = node === focus || (lit && lit.has(node)) ? COLORS.ink : COLORS.slate;
+          ctx.textAlign = 'left';
+          ctx.fillText(node.label, node.x + 9, node.y + 1);
+        }
+      });
+      ctx.globalAlpha = 1;
+    };
+
+    const advancePackets = () => {
+      packets.forEach((packet) => {
+        packet.t += packet.speed;
+        if (packet.t < 1) return;
+        const arrived = packet.edge.a === packet.from ? packet.edge.b : packet.edge.a;
+        const options = edgesOf.get(arrived).filter((edge) => edge !== packet.edge);
+        packet.edge = options.length ? options[Math.floor(Math.random() * options.length)] : packet.edge;
+        packet.from = arrived;
+        packet.t = 0;
+      });
+    };
+
+    const measure = () => {
+      nodes.forEach((node) => {
+        if (node.kind === 'core') return;
+        ctx.font = node.kind === 'project'
+          ? `750 ${Math.round(15 * Math.max(scale, 0.88))}px "Bricolage Grotesque", sans-serif`
+          : `500 ${Math.round(12.5 * Math.max(scale, 0.9))}px "Bricolage Grotesque", sans-serif`;
+        node.lw = ctx.measureText(node.label).width;
+      });
+    };
+    document.fonts?.ready.then(() => { if (running) measure(); });
+
+    const loop = (time) => {
+      if (!running) return;
+      if (visible && width) {
+        frame += 1;
+        step();
+        if (!reduced) advancePackets();
+        draw(time);
+      }
+      requestAnimationFrame(loop);
+    };
+
+    const nodeAt = (x, y) => {
+      let best = null;
+      let bestDistance = Infinity;
+      nodes.forEach((node) => {
+        const reach = node.kind === 'skill' ? 14 : 24;
+        const d = (node.x - x) ** 2 + (node.y - y) ** 2;
+        const labelHit = node.kind !== 'core' && x > node.x && x < node.x + node.lw + 20 && Math.abs(y - node.y) < 12;
+        if ((d < reach * reach || labelHit) && d < bestDistance) { best = node; bestDistance = d; }
+      });
+      return best;
+    };
+
+    const local = (event) => {
+      const rect = canvas.getBoundingClientRect();
+      return { x: event.clientX - rect.left, y: event.clientY - rect.top };
+    };
+
+    const onMove = (event) => {
+      const p = local(event);
+      pointer.x = p.x; pointer.y = p.y; pointer.inside = true;
+      if (!dragging) hovered = nodeAt(p.x, p.y);
+      canvas.style.cursor = dragging ? 'grabbing' : hovered ? (hovered.kind === 'project' ? 'pointer' : 'grab') : 'default';
+    };
+    const onLeave = () => { pointer.inside = false; if (!dragging) hovered = null; };
+    const onDown = (event) => {
+      const p = local(event);
+      const node = nodeAt(p.x, p.y);
+      downAt = { ...p, node };
+      if (node && event.pointerType === 'mouse') {
+        dragging = node;
+        canvas.setPointerCapture(event.pointerId);
+      }
+    };
+    const onUp = (event) => {
+      const p = local(event);
+      const moved = downAt ? Math.hypot(p.x - downAt.x, p.y - downAt.y) : 99;
+      const target = downAt?.node;
+      dragging = null;
+      downAt = null;
+      if (target && moved < 6 && target.kind === 'project') selectRef.current?.(target.target || target.id);
+    };
+
+    canvas.addEventListener('pointermove', onMove);
+    canvas.addEventListener('pointerleave', onLeave);
+    canvas.addEventListener('pointerdown', onDown);
+    canvas.addEventListener('pointerup', onUp);
+    const resizer = new ResizeObserver(resize);
+    resizer.observe(canvas);
+    const io = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; });
+    io.observe(canvas);
+    resize();
+
+    if (reduced) {
+      for (let i = 0; i < 400; i += 1) step();
+      frame = 400;
+    }
+    requestAnimationFrame(loop);
+
+    return () => {
+      running = false;
+      resizer.disconnect();
+      io.disconnect();
+      canvas.removeEventListener('pointermove', onMove);
+      canvas.removeEventListener('pointerleave', onLeave);
+      canvas.removeEventListener('pointerdown', onDown);
+      canvas.removeEventListener('pointerup', onUp);
+    };
+  }, [reduced]);
+
+  return <canvas ref={canvasRef} className="graph" aria-label="Interactive map of Rohit's projects and the tools behind them" role="img" />;
+}
+
+/* ================================================================== */
+/* Name that responds to the cursor through variable-font axes         */
+/* ================================================================== */
+
+function ReactiveName({ lines, sectionRef, reduced }) {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (reduced) return undefined;
+    const section = sectionRef.current;
+    const letters = Array.from(ref.current.querySelectorAll('.letter'));
+    let frameId = 0;
+    let px = -9999;
+    let py = -9999;
+    const current = letters.map(() => ({ w: 640, d: 100 }));
+
+    const tick = () => {
+      let settled = true;
+      letters.forEach((letter, i) => {
+        const rect = letter.getBoundingClientRect();
+        const distance = Math.hypot(px - (rect.left + rect.width / 2), py - (rect.top + rect.height / 2));
+        const influence = Math.max(0, 1 - distance / 280);
+        const target = { w: 640 + influence * 160, d: 100 - influence * 25 };
+        const state = current[i];
+        state.w += (target.w - state.w) * 0.18;
+        state.d += (target.d - state.d) * 0.18;
+        if (Math.abs(target.w - state.w) > 0.5 || Math.abs(target.d - state.d) > 0.1) settled = false;
+        letter.style.fontVariationSettings = `"wght" ${state.w.toFixed(0)}, "wdth" ${state.d.toFixed(1)}, "opsz" 96`;
+      });
+      frameId = settled ? 0 : requestAnimationFrame(tick);
+    };
+    const kick = () => { if (!frameId) frameId = requestAnimationFrame(tick); };
+    const onMove = (event) => { px = event.clientX; py = event.clientY; kick(); };
+    const onLeave = () => { px = -9999; py = -9999; kick(); };
+    section.addEventListener('pointermove', onMove);
+    section.addEventListener('pointerleave', onLeave);
+    return () => {
+      cancelAnimationFrame(frameId);
+      section.removeEventListener('pointermove', onMove);
+      section.removeEventListener('pointerleave', onLeave);
+    };
+  }, [sectionRef, reduced]);
+
+  let count = 0;
   return (
-    <motion.div
-      className={`cursor ${hovering ? 'is-hover' : ''} ${label ? 'has-label' : ''}`}
-      style={{ x: smoothX, y: smoothY }}
-      aria-hidden="true"
-    >
-      <span>{label}</span>
-    </motion.div>
+    <h1 ref={ref} className="name" aria-label={lines.join(' ')}>
+      {lines.map((line) => (
+        <span className="name-line" key={line} aria-hidden="true">
+          {line.split('').map((char) => {
+            count += 1;
+            return <span className="letter" key={count} style={{ '--i': count }}>{char}</span>;
+          })}
+        </span>
+      ))}
+    </h1>
   );
 }
 
-function Navigation() {
-  const { scrollY } = useScroll();
-  const [hidden, setHidden] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [open, setOpen] = useState(false);
+/* ================================================================== */
+/* Portrait drawn as dots, revealing the photo on hover                */
+/* ================================================================== */
 
-  useMotionValueEvent(scrollY, 'change', (latest) => {
-    const previous = scrollY.getPrevious() ?? 0;
-    setHidden(latest > previous && latest > 240 && !open);
-    setScrolled(latest > 40);
-  });
+function DotPortrait() {
+  const canvasRef = useRef(null);
+  const [revealed, setRevealed] = useState(false);
 
   useEffect(() => {
-    document.body.style.overflow = open ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
+    const canvas = canvasRef.current;
+    const image = new Image();
+    image.src = '/rohit.webp';
+    image.onload = () => {
+      canvas.width = 600;
+      canvas.height = 720;
+      const ctx = canvas.getContext('2d');
+      const cols = 64;
+      const cell = canvas.width / cols;
+      const rows = Math.ceil(canvas.height / cell);
+      const off = document.createElement('canvas');
+      off.width = cols;
+      off.height = rows;
+      const octx = off.getContext('2d');
+      /* cover-fit the photo into the grid */
+      const ratio = Math.max(cols / image.width, rows / image.height);
+      const w = image.width * ratio;
+      const h = image.height * ratio;
+      octx.drawImage(image, (cols - w) / 2, (rows - h) * 0.2, w, h);
+      const data = octx.getImageData(0, 0, cols, rows).data;
+      const lums = [];
+      for (let k = 0; k < data.length; k += 4) lums.push((0.299 * data[k] + 0.587 * data[k + 1] + 0.114 * data[k + 2]) / 255);
+      const sorted = [...lums].sort((m, n) => m - n);
+      const lo = sorted[Math.floor(sorted.length * 0.03)];
+      const hi = sorted[Math.floor(sorted.length * 0.9)];
+      ctx.fillStyle = '#DFE4EC';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#2F5BFF';
+      for (let y = 0; y < rows; y += 1) {
+        for (let x = 0; x < cols; x += 1) {
+          const lum = lums[y * cols + x];
+          const tone = Math.min(1, Math.max(0, (lum - lo) / (hi - lo)));
+          const radius = (1 - tone) ** 0.85 * cell * 0.62;
+          if (radius < 0.4) continue;
+          ctx.beginPath();
+          ctx.arc(x * cell + cell / 2, y * cell + cell / 2, radius, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    };
+  }, []);
+
+  return (
+    <figure className={`portrait ${revealed ? 'is-revealed' : ''}`}>
+      <button className="portrait-frame" onClick={() => setRevealed(!revealed)} aria-pressed={revealed} aria-label={revealed ? 'Show dot portrait' : 'Show photo'}>
+        <canvas ref={canvasRef} aria-hidden="true" />
+        <img src="/rohit.webp" alt="Rohit Kumar" loading="lazy" />
+      </button>
+      <figcaption>Rohit, drawn in the same dots as the graph. Hover or tap for the photo.</figcaption>
+    </figure>
+  );
+}
+
+/* ================================================================== */
+/* Command palette                                                     */
+/* ================================================================== */
+
+function CommandPalette({ open, onClose, actions }) {
+  const [query, setQuery] = useState('');
+  const [active, setActive] = useState(0);
+  const inputRef = useRef(null);
+
+  const results = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return q ? actions.filter((action) => `${action.label} ${action.hint}`.toLowerCase().includes(q)) : actions;
+  }, [query, actions]);
+
+  useEffect(() => {
+    if (!open) return;
+    setQuery('');
+    setActive(0);
+    requestAnimationFrame(() => inputRef.current?.focus());
   }, [open]);
 
-  return (
-    <>
-      <motion.header
-        className={`nav ${scrolled ? 'is-scrolled' : ''}`}
-        animate={{ y: hidden ? '-110%' : '0%' }}
-        transition={{ duration: 0.5, ease }}
-      >
-        <a className="nav-brand" href="#top" aria-label="Rohit Kumar, back to top" onClick={() => setOpen(false)}>
-          <span className="nav-monogram">RK</span>
-          <span className="nav-brand-text">Rohit Kumar</span>
-        </a>
-        <nav className="nav-links" aria-label="Main navigation">
-          {navItems.map((item) => <a key={item.href} href={item.href}><RollText>{item.label}</RollText></a>)}
-        </nav>
-        <a className="nav-cta" href={`mailto:${email}`}><span className="status-dot" /> <RollText>Let&rsquo;s talk</RollText></a>
-        <button className={`nav-toggle ${open ? 'is-open' : ''}`} onClick={() => setOpen(!open)} aria-label={open ? 'Close menu' : 'Open menu'} aria-expanded={open}>
-          <i /><i />
-        </button>
-      </motion.header>
+  if (!open) return null;
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            className="mobile-menu"
-            initial={{ clipPath: 'inset(0 0 100% 0)' }}
-            animate={{ clipPath: 'inset(0 0 0% 0)' }}
-            exit={{ clipPath: 'inset(0 0 100% 0)' }}
-            transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
-          >
-            <nav aria-label="Mobile navigation">
-              {navItems.map((item, index) => (
-                <span className="mask-line" key={item.href}>
-                  <motion.a
-                    href={item.href}
-                    onClick={() => setOpen(false)}
-                    initial={{ y: '110%' }}
-                    animate={{ y: '0%' }}
-                    exit={{ y: '110%' }}
-                    transition={{ duration: 0.7, ease, delay: 0.25 + index * 0.07 }}
-                  >
-                    <small>0{index + 1}</small>{item.label}
-                  </motion.a>
-                </span>
-              ))}
-            </nav>
-            <motion.div className="mobile-menu-foot" initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { delay: 0.6 } }} exit={{ opacity: 0 }}>
-              <a href={linkedinUrl} target="_blank" rel="noreferrer">LinkedIn</a>
-              <a href={githubUrl} target="_blank" rel="noreferrer">GitHub</a>
-              <a href={resumeUrl} target="_blank" rel="noreferrer">Resume</a>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+  const run = (action) => { onClose(); action.run(); };
+
+  const onKey = (event) => {
+    if (event.key === 'ArrowDown') { event.preventDefault(); setActive((i) => Math.min(i + 1, results.length - 1)); }
+    if (event.key === 'ArrowUp') { event.preventDefault(); setActive((i) => Math.max(i - 1, 0)); }
+    if (event.key === 'Enter' && results[active]) run(results[active]);
+    if (event.key === 'Escape') onClose();
+  };
+
+  return (
+    <div className="palette-backdrop" onMouseDown={onClose}>
+      <div className="palette" role="dialog" aria-modal="true" aria-label="Jump to" onMouseDown={(event) => event.stopPropagation()}>
+        <div className="palette-input">
+          {Icon.search}
+          <input
+            ref={inputRef}
+            value={query}
+            onChange={(event) => { setQuery(event.target.value); setActive(0); }}
+            onKeyDown={onKey}
+            placeholder="Jump to a project, section, or link"
+            aria-label="Search"
+          />
+          <kbd>Esc</kbd>
+        </div>
+        <ul>
+          {results.map((action, i) => (
+            <li key={action.label}>
+              <button className={i === active ? 'is-active' : ''} onMouseEnter={() => setActive(i)} onClick={() => run(action)}>
+                <span>{action.label}</span>
+                <small>{action.hint}</small>
+              </button>
+            </li>
+          ))}
+          {results.length === 0 && <li className="palette-empty">Nothing matches “{query}”. Try a project name or “contact”.</li>}
+        </ul>
+      </div>
+    </div>
   );
 }
 
-function Hero({ ready }) {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
-  const portraitY = useTransform(scrollYProgress, [0, 1], ['0%', '18%']);
-  const titleY = useTransform(scrollYProgress, [0, 1], ['0%', '-30%']);
-  const fade = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
+/* ================================================================== */
+/* Sections                                                            */
+/* ================================================================== */
 
-  const glowX = useMotionValue(0.5);
-  const glowY = useMotionValue(0.4);
-  const smoothGlowX = useSpring(glowX, { stiffness: 40, damping: 20 });
-  const smoothGlowY = useSpring(glowY, { stiffness: 40, damping: 20 });
-  const glowLeft = useTransform(smoothGlowX, (v) => `${v * 100}%`);
-  const glowTop = useTransform(smoothGlowY, (v) => `${v * 100}%`);
-
-  const onMove = (event) => {
-    const rect = ref.current.getBoundingClientRect();
-    glowX.set((event.clientX - rect.left) / rect.width);
-    glowY.set((event.clientY - rect.top) / rect.height);
-  };
-
-  const enter = (delay) => ({
-    initial: { opacity: 0, y: 24 },
-    animate: ready ? { opacity: 1, y: 0 } : {},
-    transition: { duration: 1, ease, delay },
-  });
+function Nav({ onOpenPalette }) {
+  const [scrolled, setScrolled] = useState(false);
+  const [menu, setMenu] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+  const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform);
+  const close = () => setMenu(false);
 
   return (
-    <section className="hero" id="top" ref={ref} onPointerMove={onMove}>
-      <motion.div className="hero-glow" style={{ left: glowLeft, top: glowTop }} aria-hidden="true" />
-      <div className="hero-grid-lines" aria-hidden="true"><i /><i /><i /></div>
+    <header className={`nav ${scrolled ? 'is-scrolled' : ''} ${menu ? 'is-open' : ''}`}>
+      <a className="nav-name" href="#top" onClick={close}>Rohit Kumar</a>
+      <nav className="nav-links" aria-label="Main">
+        <a href="#work" onClick={close}>Work</a>
+        <a href="#about" onClick={close}>About</a>
+        <a href="#research" onClick={close}>Research</a>
+        <a href="#contact" onClick={close}>Contact</a>
+      </nav>
+      <button className="nav-jump" onClick={onOpenPalette}>
+        {Icon.search}<span>Jump to</span><kbd>{isMac ? '⌘' : 'Ctrl'} K</kbd>
+      </button>
+      <button className="nav-menu" onClick={() => setMenu(!menu)} aria-expanded={menu} aria-label={menu ? 'Close menu' : 'Open menu'}>
+        <i /><i />
+      </button>
+    </header>
+  );
+}
 
-      <motion.div className="hero-inner" style={{ opacity: fade }}>
-        <div className="hero-meta">
-          <motion.p {...enter(0.1)}><span className="status-dot" /> Available for freelance &amp; internships</motion.p>
-          <motion.p {...enter(0.2)}>Based in Gurugram, India</motion.p>
+function Hero({ onSelect, reduced }) {
+  const sectionRef = useRef(null);
+  const time = useLocalTime();
+  return (
+    <section className="hero" id="top" ref={sectionRef}>
+      <SystemGraph onSelect={onSelect} reduced={reduced} />
+      <div className="hero-copy">
+        <p className="hero-status"><span className="signal" aria-hidden="true" />Open to internships and freelance work</p>
+        <ReactiveName lines={['Rohit', 'Kumar']} sectionRef={sectionRef} reduced={reduced} />
+        <p className="hero-lede">I build full-stack web systems that people run their day on: bookings, classrooms, dashboards, and live updates.</p>
+        <div className="hero-actions">
+          <a className="button button-primary" href="#work">See the work</a>
+          <a className="button button-plain" href={resumeUrl} target="_blank" rel="noreferrer">Open résumé {Icon.external}</a>
         </div>
-
-        <motion.div className="hero-title-wrap" style={{ y: titleY }}>
-          <MaskLines
-            as="h1"
-            className="hero-title"
-            play={ready}
-            delay={0.15}
-            lines={[<>Rohit</>, <><em>Kumar</em><span className="hero-period">.</span></>]}
-          />
-        </motion.div>
-
-        <motion.figure
-          className="hero-portrait"
-          initial={{ clipPath: 'inset(100% 0 0 0 round 240px 240px 18px 18px)' }}
-          animate={ready ? { clipPath: 'inset(0% 0 0 0 round 240px 240px 18px 18px)' } : {}}
-          transition={{ duration: 1.4, ease: [0.76, 0, 0.24, 1], delay: 0.35 }}
-        >
-          <motion.img
-            src="/rohit.webp"
-            alt="Portrait of Rohit Kumar"
-            style={{ y: portraitY }}
-            initial={{ scale: 1.35 }}
-            animate={ready ? { scale: 1.12 } : {}}
-            transition={{ duration: 2, ease, delay: 0.35 }}
-          />
-        </motion.figure>
-
-        <div className="hero-bottom">
-          <motion.p className="hero-intro" {...enter(0.55)}>
-            Full-stack developer who turns complex workflows into <em>useful, reliable</em> software.
-          </motion.p>
-          <motion.div className="hero-actions" {...enter(0.7)}>
-            <Magnetic><a className="btn btn-solid" href="#work"><RollText>Explore work</RollText><ArrowDown size={16} /></a></Magnetic>
-            <Magnetic><a className="btn btn-ghost" href={resumeUrl} target="_blank" rel="noreferrer"><RollText>Resume</RollText><ArrowUpRight size={16} /></a></Magnetic>
-          </motion.div>
-        </div>
-
-        <motion.a className="hero-badge" href="#about" aria-label="Scroll to about" {...enter(0.9)}>
-          <svg viewBox="0 0 120 120" aria-hidden="true">
-            <defs><path id="badge-circle" d="M60,60 m-46,0 a46,46 0 1,1 92,0 a46,46 0 1,1 -92,0" /></defs>
-            <text><textPath href="#badge-circle">Scroll to explore · Full-stack developer · </textPath></text>
-          </svg>
-          <ArrowDown size={18} />
-        </motion.a>
-      </motion.div>
+      </div>
+      <div className="hero-strip">
+        <dl>
+          <div><dt>Studying</dt><dd>B.Tech IT, VIT Vellore, 2023–2027</dd></div>
+          <div><dt>Based in</dt><dd>Gurugram, India</dd></div>
+          <div><dt>Local time</dt><dd>{time} IST</dd></div>
+        </dl>
+        <p className="graph-hint">
+          <span className="packet-key" aria-hidden="true" />
+          <span>Everything I&rsquo;ve built, wired to the tools behind it. <span className="hint-pointer">Drag a node, or click a project to open it.</span><span className="hint-touch">Tap a project to open it.</span></span>
+        </p>
+      </div>
     </section>
   );
 }
 
-function Marquee() {
-  const items = [...marqueeItems, ...marqueeItems];
+function Work({ openId, setOpenId }) {
   return (
-    <div className="marquee" aria-hidden="true">
-      <div className="marquee-track">
-        {items.map((item, index) => <span key={index}>{item}<i>✦</i></span>)}
-      </div>
-    </div>
+    <section className="work" id="work">
+      <header className="section-head">
+        <h2>Selected work</h2>
+        <p>Two paid client systems running in production, and two data and security projects built at VIT.</p>
+      </header>
+      <ul className="cases">
+        {projects.map((project) => {
+          const open = openId === project.id;
+          return (
+            <li className={`case ${open ? 'is-open' : ''}`} id={`case-${project.id}`} key={project.id}>
+              <button className="case-head" aria-expanded={open} aria-controls={`case-body-${project.id}`} onClick={() => setOpenId(open ? null : project.id)}>
+                <span className="case-year">{project.year}</span>
+                <span className="case-name">{project.name}</span>
+                <span className="case-type">{project.type}</span>
+                <span className="case-toggle" aria-hidden="true" />
+              </button>
+              <div className="case-body" id={`case-body-${project.id}`} role="region" aria-label={project.name} inert={!open}>
+                <div className="case-inner">
+                  <p className="case-description">{project.description}</p>
+                  <div className="case-meta">
+                    <p className="case-role">{project.role}</p>
+                    <ul className="case-stack">{project.stack.map((item) => <li key={item}>{item}</li>)}</ul>
+                    <div className="case-links">
+                      {project.links.map((link) => (
+                        <a key={link.href} href={link.href} target="_blank" rel="noreferrer">{link.label} {Icon.external}</a>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 }
 
 function About() {
   return (
-    <section className="section about" id="about">
-      <div className="section-head">
-        <span className="kicker">(01) Profile</span>
-      </div>
-      <ScrollWords text="I build the practical layer between a good idea and a usable product — interfaces, APIs, real-time features, and data-backed systems that hold up in production." />
+    <section className="about" id="about">
+      <DotPortrait />
+      <div className="about-copy">
+        <h2>I like the part where a requirement turns into something people use every day.</h2>
+        <p>I&rsquo;m a final-year Information Technology student at VIT Vellore. From March to June 2026 I worked freelance and shipped two paid client systems, from the first requirements call through MongoDB, admin workflows, and production deploys.</p>
+        <p>I&rsquo;m also a co-inventor on three published Indian patent applications in applied AI. That work is where my habit of asking &ldquo;how would we know this works?&rdquo; comes from.</p>
 
-      <div className="about-grid">
-        <Reveal className="about-copy">
-          <p>Currently studying Information Technology at Vellore Institute of Technology, I work across the whole stack. My freelance projects have taken ideas from first requirements to live, paying clients.</p>
-          <div className="stats">
-            <div><strong><CountUp to={2} /></strong><span>Paid freelance<br />client builds</span></div>
-            <div><strong><CountUp to={3} /></strong><span>Published patent<br />applications</span></div>
-            <div><strong><CountUp to={32} suffix="GB" /></strong><span>Largest dataset<br />analysed</span></div>
-          </div>
-        </Reveal>
-        <div className="timeline">
-          {education.map((item, index) => (
-            <Reveal className="timeline-row" key={item.title} delay={index * 0.08}>
-              <span className="timeline-year">{item.year}</span>
-              <div><h3>{item.title}</h3><p>{item.place}</p></div>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Capabilities() {
-  return (
-    <section className="section capabilities">
-      <div className="section-head split">
-        <span className="kicker">(02) What I build</span>
-        <MaskLines lines={['Full-stack craft, grounded', <>in how people <em>actually</em> work.</>]} />
-      </div>
-      <div className="cap-grid">
-        {capabilities.map((capability, index) => {
-          const Icon = capability.icon;
-          return (
-            <Reveal className="cap-card" key={capability.label} delay={index * 0.08} as="article">
-              <div className="cap-inner" onPointerMove={trackSpotlight}>
-                <div className="cap-top"><Icon size={22} strokeWidth={1.4} /><span>0{index + 1}</span></div>
-                <h3>{capability.label}</h3>
-                <p>{capability.text}</p>
-              </div>
-            </Reveal>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
-function ProjectCard({ project, index, total, progress, wide, setCursorLabel }) {
-  const start = index / total;
-  const targetScale = 1 - (total - 1 - index) * 0.045;
-  const scale = useTransform(progress, [start, 1], [1, wide ? targetScale : 1]);
-  const dim = useTransform(progress, [start, 1], [0, wide ? (total - 1 - index) * 0.12 : 0]);
-
-  return (
-    <div className="project-sticky" style={{ top: wide ? `calc(110px + ${index * 26}px)` : undefined }}>
-      <motion.article
-        className={`project ${project.tone}`}
-        style={{ scale }}
-        initial={{ opacity: 0, y: 60 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.15 }}
-        transition={{ duration: 1, ease }}
-        onPointerMove={trackSpotlight}
-        onPointerEnter={() => setCursorLabel('View')}
-        onPointerLeave={() => setCursorLabel('')}
-      >
-        <motion.div className="project-dim" style={{ opacity: dim }} aria-hidden="true" />
-        <div className="project-head">
-          <span className="project-number">{project.number}</span>
-          <span className="project-type">{project.type}</span>
-          <span className="project-year">{project.year}</span>
-        </div>
-        <div className="project-body">
-          <h3>{project.name}</h3>
-          <div className="project-side">
-            <p className="project-focus"><span className="status-dot" /> {project.focus}</p>
-            <p className="project-description">{project.description}</p>
-            <div className="project-stack">{project.stack.map((item) => <span key={item}>{item}</span>)}</div>
-            <div className="project-links">
-              {project.links.map((link) => (
-                <a key={link.href} href={link.href} target="_blank" rel="noreferrer"><RollText>{link.label}</RollText><ArrowUpRight size={15} /></a>
+        <div className="about-columns">
+          <div>
+            <h3>Education</h3>
+            <ol className="timeline">
+              {education.map((item) => (
+                <li key={item.title}><span>{item.years}</span><div><strong>{item.title}</strong><em>{item.place}</em></div></li>
               ))}
-            </div>
+            </ol>
+          </div>
+          <div>
+            <h3>What I work with</h3>
+            <dl className="toolkit">
+              {toolkit.map(([group, items]) => (
+                <div key={group}><dt>{group}</dt><dd>{items.join(', ')}</dd></div>
+              ))}
+            </dl>
           </div>
         </div>
-        <span className="project-ghost" aria-hidden="true">{project.number}</span>
-      </motion.article>
-    </div>
-  );
-}
-
-function Work({ setCursorLabel }) {
-  const ref = useRef(null);
-  const wide = useIsWide();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] });
-
-  return (
-    <section className="section work" id="work">
-      <div className="section-head split">
-        <span className="kicker">(03) Selected work</span>
-        <MaskLines lines={['Systems with a', <><em>clear</em> purpose.</>]} />
-      </div>
-      <div className="project-stack-wrap" ref={ref}>
-        {projects.map((project, index) => (
-          <ProjectCard
-            key={project.name}
-            project={project}
-            index={index}
-            total={projects.length}
-            progress={scrollYProgress}
-            wide={wide}
-            setCursorLabel={setCursorLabel}
-          />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function Toolkit() {
-  return (
-    <section className="section toolkit">
-      <div className="section-head split">
-        <span className="kicker">(04) Toolkit</span>
-        <MaskLines lines={['Comfortable across the stack,', <>focused on the <em>outcome</em>.</>]} />
-      </div>
-      <div className="tool-grid">
-        {skillGroups.map(([label, ...skills], groupIndex) => (
-          <Reveal className="tool-group" key={label} delay={groupIndex * 0.08}>
-            <p className="tool-label"><span>0{groupIndex + 1}</span>{label}</p>
-            <ul>
-              {skills.map((skill, index) => (
-                <motion.li
-                  key={skill}
-                  initial={{ opacity: 0, x: -12 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, ease, delay: 0.2 + groupIndex * 0.08 + index * 0.05 }}
-                >
-                  {skill}
-                </motion.li>
-              ))}
-            </ul>
-          </Reveal>
-        ))}
       </div>
     </section>
   );
@@ -640,209 +831,173 @@ function Toolkit() {
 
 function Research() {
   return (
-    <section className="section research" id="research">
-      <div className="section-head split">
-        <span className="kicker">(05) Research</span>
-        <MaskLines lines={['Curious enough to go', <>beyond the <em>implementation</em>.</>]} />
-      </div>
-      <div className="research-layout">
-        <Reveal className="research-figure">
-          <span><CountUp to={3} /></span>
-          <p>Co-inventor on three published Indian patent applications exploring adaptive AI, behavioral risk analysis, and interpretable language-model systems.</p>
-        </Reveal>
-        <ol className="patent-list">
-          {patents.map((patent, index) => (
-            <Reveal as="li" key={patent} delay={index * 0.08}>
-              <span className="patent-index">0{index + 1}</span>
-              <p>{patent}</p>
-              <span className="patent-tag">Patent application</span>
-            </Reveal>
-          ))}
-        </ol>
-      </div>
-    </section>
-  );
-}
-
-function Experience() {
-  return (
-    <section className="section experience">
-      <div className="section-head">
-        <span className="kicker">(06) Experience</span>
-      </div>
-      <Reveal className="exp-row">
-        <span className="exp-date">Mar 2026 — Jun 2026</span>
-        <div className="exp-main">
-          <h3>Freelance Full-Stack Developer</h3>
-          <p className="exp-where">Self-employed · Vellore, Tamil Nadu</p>
+    <section className="research" id="research">
+      <header className="section-head">
+        <h2>Research</h2>
+        <p>Co-inventor on three published Indian patent applications exploring adaptive AI, behavioral risk analysis, and interpretable language models.</p>
+      </header>
+      <ul className="patents">
+        {patents.map((title) => (
+          <li key={title}>
+            <p>{title}</p>
+            <span>Indian patent application, published</span>
+          </li>
+        ))}
+      </ul>
+      <div className="experience">
+        <h2>Experience</h2>
+        <div className="experience-row">
+          <p className="experience-when">Mar – Jun 2026</p>
+          <div>
+            <h3>Freelance full-stack developer</h3>
+            <p>Self-employed, Vellore. Delivered two paid client projects end to end: requirements, MongoDB integration, admin workflows, and production deployment.</p>
+          </div>
         </div>
-        <p className="exp-detail">Independently delivered two paid client projects, from requirements and MongoDB integration to admin workflows and production deployment.</p>
-      </Reveal>
+      </div>
     </section>
   );
 }
 
 function Contact() {
-  const [status, setStatus] = useState('');
-  const [sending, setSending] = useState(false);
+  const [state, setState] = useState({ phase: 'idle', email: '' });
+  const [copied, setCopied] = useState(false);
 
   const sendMessage = async (event) => {
     event.preventDefault();
-    setSending(true);
-    setStatus('');
     const formElement = event.currentTarget;
-    const form = new FormData(formElement);
+    const values = Object.fromEntries(new FormData(formElement).entries());
+    setState({ phase: 'sending', email: values.email });
     try {
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(Object.fromEntries(form.entries())),
+        body: JSON.stringify(values),
       });
       if (!response.ok) throw new Error('Message could not be sent.');
       formElement.reset();
-      setStatus('success');
+      setState({ phase: 'sent', email: values.email });
     } catch {
-      setStatus('error');
-    } finally {
-      setSending(false);
+      setState({ phase: 'error', email: values.email });
+    }
+  };
+
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(email);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      window.location.href = `mailto:${email}`;
     }
   };
 
   return (
-    <section className="section contact" id="contact">
-      <div className="section-head">
-        <span className="kicker">(07) Contact</span>
+    <section className="contact" id="contact">
+      <div className="contact-intro">
+        <h2>Tell me what you&rsquo;re building.</h2>
+        <p>A product, a role, or a problem that needs a working system. I usually reply within a day.</p>
+        <ul className="contact-links">
+          <li><button onClick={copyEmail}>{Icon.mail}<span>{copied ? 'Email address copied' : email}</span></button></li>
+          <li><a href={`tel:${phone.replace(/\s/g, '')}`}>{Icon.phone}<span>{phone}</span></a></li>
+          <li><a href={linkedinUrl} target="_blank" rel="noreferrer">{Icon.linkedin}<span>LinkedIn</span></a></li>
+          <li><a href={githubUrl} target="_blank" rel="noreferrer">{Icon.github}<span>GitHub</span></a></li>
+        </ul>
       </div>
-      <MaskLines className="contact-title" lines={['Have an idea', <>worth <em>building?</em></>]} />
 
-      <div className="contact-grid">
-        <Reveal className="contact-info">
-          <p className="contact-lead">Let&rsquo;s make it feel simple on the other side. Tell me about the product, the role, or the problem.</p>
-          <ul className="contact-links">
-            <li><a href={`mailto:${email}`}><AtSign size={17} /><RollText>{email}</RollText></a></li>
-            <li><a href="tel:+918433787405"><Phone size={17} /><RollText>+91 8433787405</RollText></a></li>
-            <li><span><MapPin size={17} /> Gurugram, Haryana, India</span></li>
-            <li><a href={linkedinUrl} target="_blank" rel="noreferrer"><Linkedin size={17} /><RollText>LinkedIn profile</RollText><ArrowUpRight size={14} /></a></li>
-            <li><a href={githubUrl} target="_blank" rel="noreferrer"><Github size={17} /><RollText>github.com/rohitpawalia28</RollText><ArrowUpRight size={14} /></a></li>
-          </ul>
-        </Reveal>
-
-        <Reveal className="contact-form-wrap" delay={0.1}>
-          <form onSubmit={sendMessage} className="contact-form">
-            <label className="field">
-              <input name="name" required minLength="2" placeholder=" " autoComplete="name" />
-              <span>Your name</span>
-            </label>
-            <label className="field">
-              <input name="email" type="email" required placeholder=" " autoComplete="email" />
-              <span>Email address</span>
-            </label>
-            <label className="field">
-              <textarea name="message" required minLength="10" rows="4" placeholder=" " />
-              <span>Tell me a little about it</span>
-            </label>
-            <div className="form-foot">
-              <Magnetic strength={0.2}>
-                <button className="btn btn-solid btn-send" type="submit" disabled={sending}>
-                  <RollText>{sending ? 'Sending…' : 'Send message'}</RollText>
-                  <Send size={16} />
-                </button>
-              </Magnetic>
-              <AnimatePresence mode="wait">
-                {status && (
-                  <motion.p
-                    key={status}
-                    className={`form-status ${status === 'success' ? 'is-success' : 'is-error'}`}
-                    role="status"
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                  >
-                    {status === 'success'
-                      ? 'Message sent successfully. Rohit will get back to you soon.'
-                      : 'Your message could not be sent right now. Please try again in a moment.'}
-                  </motion.p>
-                )}
-              </AnimatePresence>
-            </div>
-          </form>
-        </Reveal>
-      </div>
+      <form className="contact-form" onSubmit={sendMessage}>
+        <label>
+          <span>Your name</span>
+          <input name="name" required minLength="2" autoComplete="name" />
+        </label>
+        <label>
+          <span>Email</span>
+          <input name="email" type="email" required autoComplete="email" />
+        </label>
+        <label>
+          <span>Message</span>
+          <textarea name="message" required minLength="10" rows="5" placeholder="What are you working on, and where could I help?" />
+        </label>
+        <div className="form-foot">
+          <button className="button button-primary" type="submit" disabled={state.phase === 'sending'}>
+            {state.phase === 'sending' ? 'Sending…' : 'Send message'}
+          </button>
+          <p className={`form-status is-${state.phase}`} role="status">
+            {state.phase === 'sent' && `Message sent. I’ll reply to ${state.email}.`}
+            {state.phase === 'error' && 'Message not sent: the server didn’t respond. Try again, or email me directly.'}
+          </p>
+        </div>
+      </form>
     </section>
   );
-}
-
-function LocalTime() {
-  const format = () => new Intl.DateTimeFormat('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' }).format(new Date());
-  const [time, setTime] = useState(format);
-  useEffect(() => {
-    const id = setInterval(() => setTime(format()), 15000);
-    return () => clearInterval(id);
-  }, []);
-  return <span>{time} IST</span>;
 }
 
 function Footer() {
   return (
     <footer className="footer">
-      <div className="footer-big" aria-hidden="true">
-        <motion.span
-          initial={{ y: '40%', opacity: 0 }}
-          whileInView={{ y: '0%', opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1.2, ease }}
-        >
-          Rohit <em>Kumar</em>
-        </motion.span>
-      </div>
-      <div className="footer-row">
-        <p>© {new Date().getFullYear()} Designed &amp; built by Rohit Kumar</p>
-        <p className="footer-time">Local time · <LocalTime /></p>
-        <div className="footer-links">
-          <a href={linkedinUrl} target="_blank" rel="noreferrer"><RollText>LinkedIn</RollText></a>
-          <a href={githubUrl} target="_blank" rel="noreferrer"><RollText>GitHub</RollText></a>
-          <a href="#top" className="to-top" aria-label="Back to top"><ArrowUp size={16} /></a>
-        </div>
+      <p>Rohit Kumar, {new Date().getFullYear()}. Designed and built by hand.</p>
+      <div>
+        <a href={githubUrl} target="_blank" rel="noreferrer" aria-label="GitHub">{Icon.github}</a>
+        <a href={linkedinUrl} target="_blank" rel="noreferrer" aria-label="LinkedIn">{Icon.linkedin}</a>
+        <a href="#top">Back to top</a>
       </div>
     </footer>
   );
 }
 
-/* ------------------------------------------------------------------ */
+/* ================================================================== */
 /* Page                                                                */
-/* ------------------------------------------------------------------ */
+/* ================================================================== */
 
 function App() {
-  const reduceMotion = useReducedMotion();
-  const [loading, setLoading] = useState(!reduceMotion);
-  const [cursorLabel, setCursorLabel] = useState('');
-  const finishLoading = useCallback(() => setLoading(false), []);
-  const { scrollYProgress } = useScroll();
-  const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 28, restDelta: 0.001 });
+  const reduced = useReducedMotion();
+  const [openId, setOpenId] = useState('ace');
+  const [paletteOpen, setPaletteOpen] = useState(false);
+
+  const goTo = useCallback((hash) => {
+    document.querySelector(hash)?.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+  }, [reduced]);
+
+  const openProject = useCallback((id) => {
+    if (id === 'research') { goTo('#research'); return; }
+    setOpenId(id);
+    requestAnimationFrame(() => goTo(`#case-${id}`));
+  }, [goTo]);
+
+  const actions = useMemo(() => [
+    ...projects.map((project) => ({ label: project.name, hint: project.type, run: () => openProject(project.id) })),
+    { label: 'About', hint: 'Background and education', run: () => goTo('#about') },
+    { label: 'Research', hint: 'Patent applications', run: () => goTo('#research') },
+    { label: 'Contact', hint: 'Send a message', run: () => goTo('#contact') },
+    { label: 'Résumé', hint: 'Opens in a new tab', run: () => window.open(resumeUrl, '_blank', 'noopener') },
+    { label: 'GitHub', hint: 'github.com/rohitpawalia28', run: () => window.open(githubUrl, '_blank', 'noopener') },
+    { label: 'LinkedIn', hint: 'Profile', run: () => window.open(linkedinUrl, '_blank', 'noopener') },
+    { label: 'Copy email address', hint: email, run: () => navigator.clipboard?.writeText(email) },
+  ], [goTo, openProject]);
 
   useEffect(() => {
-    document.documentElement.classList.toggle('is-loading', loading);
-  }, [loading]);
+    const onKey = (event) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        setPaletteOpen((open) => !open);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   return (
     <>
-      <AnimatePresence>{loading && <Preloader onDone={finishLoading} />}</AnimatePresence>
-      <Cursor label={cursorLabel} />
-      <div className="grain" aria-hidden="true" />
-      <motion.div className="progress" style={{ scaleX: progress }} aria-hidden="true" />
-      <Navigation />
+      <a className="skip" href="#work">Skip to work</a>
+      <Nav onOpenPalette={() => setPaletteOpen(true)} />
       <main>
-        <Hero ready={!loading} />
-        <Marquee />
+        <Hero onSelect={openProject} reduced={reduced} />
+        <Work openId={openId} setOpenId={setOpenId} />
         <About />
-        <Capabilities />
-        <Work setCursorLabel={setCursorLabel} />
-        <Toolkit />
         <Research />
-        <Experience />
         <Contact />
       </main>
       <Footer />
+      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} actions={actions} />
     </>
   );
 }

@@ -118,3 +118,18 @@ export const processSteps = [
     text: 'Deployed to production with an admin dashboard, so the client can run things without me. Then I fix whatever real use uncovers.',
   },
 ];
+
+export const experience = [
+  {
+    role: 'Freelance full-stack developer',
+    org: 'Self-employed',
+    place: 'Vellore, Tamil Nadu',
+    dates: 'Mar 2026 – Jun 2026',
+    points: [
+      'Built and delivered ACE Academy, a role-based institute management system for admins, teachers, and students, with live updates over Socket.IO.',
+      'Built and delivered the Platinum Unisex Salon website, with appointment booking, customer enquiries, and an admin dashboard the owner runs daily.',
+      'Owned both projects end to end: requirements, MongoDB data modelling, admin workflows, and production deployment.',
+    ],
+    stack: ['React', 'Node.js', 'Express', 'MongoDB', 'Socket.IO', 'Vercel'],
+  },
+];

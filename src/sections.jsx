@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useRef, useState } from 'react';
-import { education, email, githubUrl, linkedinUrl, patents, phone, processSteps, projects, resumeUrl, toolkit } from './content';
+import { education, email, experience, githubUrl, linkedinUrl, patents, phone, processSteps, projects, resumeUrl, toolkit } from './content';
 
 /* ================================================================== */
 /* Shared: run a callback once an element scrolls into view            */
@@ -62,7 +62,8 @@ export function Sweep({ as: Tag = 'h2', children, className = '' }) {
 
 const stops = [
   { id: 'top', label: 'Start' },
-  { id: 'work', label: 'Work' },
+  { id: 'work', label: 'Projects' },
+  { id: 'experience', label: 'Experience' },
   { id: 'process', label: 'Process' },
   { id: 'about', label: 'About' },
   { id: 'research', label: 'Research' },
@@ -115,45 +116,6 @@ export function RouteRail() {
         </ol>
       </nav>
     </>
-  );
-}
-
-/* ================================================================== */
-/* Scroll band: two crossing bands that slide as you scroll            */
-/* ================================================================== */
-
-const bandWords = ['Requirements', 'Data models', 'APIs', 'Real-time updates', 'Interfaces', 'Admin dashboards', 'Deploys'];
-
-export function ScrollBand() {
-  const ref = useRef(null);
-
-  useEffect(() => {
-    if (prefersReducedMotion()) return undefined;
-    const element = ref.current;
-    let frame = 0;
-    const update = () => {
-      frame = 0;
-      const rect = element.getBoundingClientRect();
-      if (rect.bottom < -200 || rect.top > window.innerHeight + 200) return;
-      const offset = (window.innerHeight - rect.top) * 0.45;
-      element.style.setProperty('--shift', `${offset}px`);
-    };
-    const onScroll = () => { if (!frame) frame = requestAnimationFrame(update); };
-    update();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => { cancelAnimationFrame(frame); window.removeEventListener('scroll', onScroll); };
-  }, []);
-
-  const row = [...bandWords, ...bandWords, ...bandWords];
-  return (
-    <div className="band" ref={ref} aria-hidden="true">
-      <div className="band-row band-a">
-        <div className="band-track">{row.map((word, i) => <span key={i}>{word}<i /></span>)}</div>
-      </div>
-      <div className="band-row band-b">
-        <div className="band-track">{[...row].reverse().map((word, i) => <span key={i}>{word}<i /></span>)}</div>
-      </div>
-    </div>
   );
 }
 
@@ -331,7 +293,7 @@ export function ProcessStory() {
 /* Terminal: for visitors who would rather type                        */
 /* ================================================================== */
 
-const commandList = ['help', 'whoami', 'projects', 'open <project>', 'stack', 'patents', 'education', 'contact', 'resume', 'time', 'clear', 'sudo hire rohit'];
+const commandList = ['help', 'whoami', 'projects', 'open <project>', 'experience', 'stack', 'patents', 'education', 'contact', 'resume', 'hire', 'clear'];
 
 function respond(raw, { onOpenProject, onGoTo }) {
   const input = raw.trim();
@@ -340,9 +302,9 @@ function respond(raw, { onOpenProject, onGoTo }) {
   const lower = input.toLowerCase();
 
   if (!input) return [];
-  if (lower === 'sudo hire rohit' || lower === 'hire rohit' || lower === 'hire') {
+  if (lower === 'hire' || lower === 'hire rohit' || lower === 'sudo hire rohit') {
     setTimeout(() => onGoTo('#contact'), 900);
-    return [{ text: 'Permission granted.', tone: 'ok' }, { text: 'Taking you to the contact form…' }];
+    return [{ text: 'Opening the contact form…', tone: 'ok' }];
   }
 
   switch (command.toLowerCase()) {
@@ -367,6 +329,12 @@ function respond(raw, { onOpenProject, onGoTo }) {
       setTimeout(() => onOpenProject(match.id), 600);
       return [{ text: `Opening ${match.name}…`, tone: 'ok' }];
     }
+    case 'experience':
+      return experience.flatMap((job) => [
+        { text: `${job.role}, ${job.org}`, tone: 'head' },
+        { text: `${job.dates}, ${job.place}`, tone: 'dim' },
+        ...job.points.map((point) => ({ text: `- ${point}` })),
+      ]);
     case 'stack':
       return toolkit.map(([group, items]) => ({ text: `${group.padEnd(11)} ${items.join(', ')}` }));
     case 'patents':
@@ -380,11 +348,7 @@ function respond(raw, { onOpenProject, onGoTo }) {
       return [{ text: 'Opening résumé in a new tab.', tone: 'ok' }];
     case 'time':
     case 'date':
-      return [{ text: `${new Intl.DateTimeFormat('en-IN', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Kolkata' }).format(new Date())} IST, where Rohit is.` }];
-    case 'sudo':
-      return [{ text: 'Nice try. The only sudo command here is "sudo hire rohit".', tone: 'dim' }];
-    case 'exit':
-      return [{ text: 'There is no exit. Only the contact form.', tone: 'dim' }];
+      return [{ text: `${new Intl.DateTimeFormat('en-IN', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Kolkata' }).format(new Date())} IST` }];
     default:
       return [{ text: `command not found: ${command}. Type "help" to see what's available.`, tone: 'err' }];
   }
@@ -456,10 +420,10 @@ export function Terminal({ onOpenProject, onGoTo }) {
   return (
     <section className="terminal-section" id="terminal" ref={sectionRef}>
       <div className="terminal-copy">
-        <Sweep>Prefer a terminal?</Sweep>
-        <p>Everything on this page also answers to commands. Type one, or tap a suggestion.</p>
+        <Sweep>Quick lookup</Sweep>
+        <p>Prefer the command line? Everything on this page is available as a command. Type one, or tap a suggestion.</p>
         <div className="terminal-suggestions">
-          {['help', 'projects', 'stack', 'patents', 'sudo hire rohit'].map((command) => (
+          {['help', 'projects', 'experience', 'stack', 'contact'].map((command) => (
             <button key={command} onClick={() => { run(command); }}>{command}</button>
           ))}
         </div>

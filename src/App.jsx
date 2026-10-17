@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { education, email, githubUrl, linkedinUrl, patents, phone, projects, resumeUrl, toolkit } from './content';
-import { FlowDiagram, ProcessStory, RouteRail, ScrollBand, Sweep, Terminal } from './sections';
+import { education, email, experience, githubUrl, linkedinUrl, patents, phone, projects, resumeUrl, toolkit } from './content';
+import { FlowDiagram, ProcessStory, RouteRail, Sweep, Terminal } from './sections';
 
 /* Graph: me → projects → the tools each one was built with. */
 const graphNodes = [
@@ -75,8 +75,8 @@ function useLocalTime() {
 /* The live system graph                                               */
 /* ================================================================== */
 
-/* Night palette, matching the CSS tokens. `ink` is the text colour, `paper` the page. */
-const COLORS = { ink: '#E9EDF7', cobalt: '#7491FF', fill: '#3557F5', packet: '#FFC83D', slate: '#8089A3', line: 'rgba(233,237,247,0.14)', paper: '#0A0F1E', label: 'rgba(10,15,30,0.86)' };
+/* Graphite + teal, matching the CSS tokens. `ink` is the text colour, `paper` the page, `cobalt` the accent. */
+const COLORS = { ink: '#ECEDEE', cobalt: '#2BB39A', fill: '#2BB39A', packet: '#5FE0C6', slate: '#868C93', line: 'rgba(236,237,238,0.13)', paper: '#111315', label: 'rgba(17,19,21,0.86)' };
 
 function SystemGraph({ onSelect, reduced }) {
   const canvasRef = useRef(null);
@@ -256,7 +256,7 @@ function SystemGraph({ onSelect, reduced }) {
         ctx.beginPath();
         ctx.moveTo(from.x, from.y);
         ctx.lineTo(to.x, to.y);
-        ctx.strokeStyle = active ? COLORS.cobalt : focus ? 'rgba(233,237,247,0.05)' : COLORS.line;
+        ctx.strokeStyle = active ? COLORS.cobalt : focus ? 'rgba(236,237,238,0.05)' : COLORS.line;
         ctx.lineWidth = active ? 1.6 : 1;
         ctx.stroke();
       });
@@ -269,8 +269,8 @@ function SystemGraph({ onSelect, reduced }) {
           const y = packet.from.y + (to.y - packet.from.y) * packet.t;
           ctx.beginPath();
           ctx.arc(x, y, 3.4, 0, Math.PI * 2);
-          ctx.shadowColor = 'rgba(255,200,61,0.9)';
-          ctx.shadowBlur = 12;
+          ctx.shadowColor = 'rgba(95,224,198,0.7)';
+          ctx.shadowBlur = 8;
           ctx.fillStyle = COLORS.packet;
           ctx.fill();
           ctx.shadowBlur = 0;
@@ -288,13 +288,13 @@ function SystemGraph({ onSelect, reduced }) {
           const pulse = reduced ? 0 : (Math.sin(time / 700) + 1) * 3;
           ctx.beginPath();
           ctx.arc(node.x, node.y, 22 + pulse, 0, Math.PI * 2);
-          ctx.strokeStyle = 'rgba(116,145,255,0.45)';
+          ctx.strokeStyle = 'rgba(43,179,154,0.4)';
           ctx.lineWidth = 1;
           ctx.stroke();
           ctx.beginPath();
           ctx.arc(node.x, node.y, 14, 0, Math.PI * 2);
-          ctx.shadowColor = 'rgba(83,116,255,0.95)';
-          ctx.shadowBlur = 30;
+          ctx.shadowColor = 'rgba(43,179,154,0.6)';
+          ctx.shadowBlur = 18;
           ctx.fillStyle = COLORS.fill;
           ctx.fill();
           ctx.shadowBlur = 0;
@@ -498,68 +498,6 @@ function ReactiveName({ lines, sectionRef, reduced, as: Tag = 'h1', className = 
 }
 
 /* ================================================================== */
-/* Portrait drawn as dots, revealing the photo on hover                */
-/* ================================================================== */
-
-function DotPortrait() {
-  const canvasRef = useRef(null);
-  const [revealed, setRevealed] = useState(false);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const image = new Image();
-    image.src = '/rohit.webp';
-    image.onload = () => {
-      canvas.width = 600;
-      canvas.height = 720;
-      const ctx = canvas.getContext('2d');
-      const cols = 64;
-      const cell = canvas.width / cols;
-      const rows = Math.ceil(canvas.height / cell);
-      const off = document.createElement('canvas');
-      off.width = cols;
-      off.height = rows;
-      const octx = off.getContext('2d');
-      /* cover-fit the photo into the grid */
-      const ratio = Math.max(cols / image.width, rows / image.height);
-      const w = image.width * ratio;
-      const h = image.height * ratio;
-      octx.drawImage(image, (cols - w) / 2, (rows - h) * 0.2, w, h);
-      const data = octx.getImageData(0, 0, cols, rows).data;
-      const lums = [];
-      for (let k = 0; k < data.length; k += 4) lums.push((0.299 * data[k] + 0.587 * data[k + 1] + 0.114 * data[k + 2]) / 255);
-      const sorted = [...lums].sort((m, n) => m - n);
-      const lo = sorted[Math.floor(sorted.length * 0.03)];
-      const hi = sorted[Math.floor(sorted.length * 0.9)];
-      ctx.fillStyle = '#5B7BFF';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#0A0F1E';
-      for (let y = 0; y < rows; y += 1) {
-        for (let x = 0; x < cols; x += 1) {
-          const lum = lums[y * cols + x];
-          const tone = Math.min(1, Math.max(0, (lum - lo) / (hi - lo)));
-          const radius = (1 - tone) ** 0.85 * cell * 0.62;
-          if (radius < 0.4) continue;
-          ctx.beginPath();
-          ctx.arc(x * cell + cell / 2, y * cell + cell / 2, radius, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
-    };
-  }, []);
-
-  return (
-    <figure className={`portrait ${revealed ? 'is-revealed' : ''}`}>
-      <button className="portrait-frame" onClick={() => setRevealed(!revealed)} aria-pressed={revealed} aria-label={revealed ? 'Show dot portrait' : 'Show photo'}>
-        <canvas ref={canvasRef} aria-hidden="true" />
-        <img src="/rohit.webp" alt="Rohit Kumar" loading="lazy" />
-      </button>
-      <figcaption>Rohit, drawn in the same dots as the graph. Hover or tap for the photo.</figcaption>
-    </figure>
-  );
-}
-
-/* ================================================================== */
 /* Command palette                                                     */
 /* ================================================================== */
 
@@ -642,8 +580,8 @@ function Nav({ onOpenPalette }) {
     <header className={`nav ${scrolled ? 'is-scrolled' : ''} ${menu ? 'is-open' : ''}`}>
       <a className="nav-name" href="#top" onClick={close}>Rohit Kumar</a>
       <nav className="nav-links" aria-label="Main">
-        <a href="#work" onClick={close}>Work</a>
-        <a href="#process" onClick={close}>Process</a>
+        <a href="#work" onClick={close}>Projects</a>
+        <a href="#experience" onClick={close}>Experience</a>
         <a href="#about" onClick={close}>About</a>
         <a href="#research" onClick={close}>Research</a>
         <a href="#contact" onClick={close}>Contact</a>
@@ -667,9 +605,10 @@ function Hero({ onSelect, reduced }) {
       <div className="hero-copy">
         <p className="hero-status"><span className="signal" aria-hidden="true" />Open to internships and freelance work</p>
         <ReactiveName lines={['Rohit', 'Kumar']} sectionRef={sectionRef} reduced={reduced} />
-        <p className="hero-lede">I build full-stack web systems that people run their day on: bookings, classrooms, dashboards, and live updates.</p>
+        <p className="hero-role">Full-stack developer</p>
+        <p className="hero-lede">I build web systems that people run their day on: bookings, classrooms, dashboards, and live updates.</p>
         <div className="hero-actions">
-          <a className="button button-primary" href="#work">See the work</a>
+          <a className="button button-primary" href="#work">View projects</a>
           <a className="button button-plain" href={resumeUrl} target="_blank" rel="noreferrer">Open résumé {Icon.external}</a>
         </div>
       </div>
@@ -679,9 +618,9 @@ function Hero({ onSelect, reduced }) {
           <div><dt>Based in</dt><dd>Gurugram, India</dd></div>
           <div><dt>Local time</dt><dd>{time} IST</dd></div>
         </dl>
-        <a className="scroll-cue" href="#work" aria-label="Scroll to the work">
+        <a className="scroll-cue" href="#work" aria-label="Scroll to projects">
           <span className="scroll-cue-line" aria-hidden="true"><i /></span>
-          <span>Follow the route</span>
+          <span>Scroll</span>
         </a>
         <p className="graph-hint">
           <span className="packet-key" aria-hidden="true" />
@@ -696,8 +635,8 @@ function Work({ openId, setOpenId }) {
   return (
     <section className="work" id="work">
       <header className="section-head">
-        <Sweep>Selected work</Sweep>
-        <p>Two paid client systems running in production, and two data and security projects built at VIT.</p>
+        <Sweep>Projects</Sweep>
+        <p>Two paid client systems running in production, and two data and security projects built at VIT. Open any project to see how it works.</p>
       </header>
       <ul className="cases">
         {projects.map((project) => {
@@ -735,14 +674,45 @@ function Work({ openId, setOpenId }) {
   );
 }
 
+function Experience() {
+  return (
+    <section className="experience" id="experience">
+      <header className="section-head">
+        <Sweep>Experience</Sweep>
+        <p>Paid, independent client work, delivered from first requirements call to production.</p>
+      </header>
+      <ol className="jobs">
+        {experience.map((job) => (
+          <li className="job" key={job.role}>
+            <div className="job-when">
+              <p className="job-dates">{job.dates}</p>
+              <p>{job.place}</p>
+            </div>
+            <div className="job-main">
+              <h3>{job.role}</h3>
+              <p className="job-org">{job.org}</p>
+              <ul className="job-points">
+                {job.points.map((point) => <li key={point}>{point}</li>)}
+              </ul>
+              <ul className="case-stack">{job.stack.map((item) => <li key={item}>{item}</li>)}</ul>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
 function About() {
   return (
     <section className="about" id="about">
-      <DotPortrait />
+      <figure className="portrait">
+        <div className="portrait-frame"><img src="/rohit.webp" alt="Rohit Kumar" loading="lazy" width="900" height="1099" /></div>
+      </figure>
       <div className="about-copy">
         <Sweep>I like the part where a requirement turns into something people use every day.</Sweep>
         <p>I&rsquo;m a final-year Information Technology student at VIT Vellore. From March to June 2026 I worked freelance and shipped two paid client systems, from the first requirements call through MongoDB, admin workflows, and production deploys.</p>
-        <p>I&rsquo;m also a co-inventor on three published Indian patent applications in applied AI. That work is where my habit of asking &ldquo;how would we know this works?&rdquo; comes from.</p>
+        <p>I&rsquo;m also a co-inventor on three published Indian patent applications in applied AI, which taught me to test an idea properly before calling it done.</p>
 
         <div className="about-columns">
           <div>
@@ -778,20 +748,10 @@ function Research() {
         {patents.map((title) => (
           <li key={title}>
             <p>{title}</p>
-            <span>Indian patent application, published</span>
+            <span>Published Indian patent application</span>
           </li>
         ))}
       </ul>
-      <div className="experience">
-        <Sweep>Experience</Sweep>
-        <div className="experience-row">
-          <p className="experience-when">Mar – Jun 2026</p>
-          <div>
-            <h3>Freelance full-stack developer</h3>
-            <p>Self-employed, Vellore. Delivered two paid client projects end to end: requirements, MongoDB integration, admin workflows, and production deployment.</p>
-          </div>
-        </div>
-      </div>
     </section>
   );
 }
@@ -832,8 +792,8 @@ function Contact() {
   return (
     <section className="contact" id="contact">
       <div className="contact-intro">
-        <Sweep>Tell me what you’re building.</Sweep>
-        <p>A product, a role, or a problem that needs a working system. I usually reply within a day.</p>
+        <Sweep>Get in touch</Sweep>
+        <p>Hiring for an internship or role, or need a web system built? Send a message and I&rsquo;ll reply within a day.</p>
         <ul className="contact-links">
           <li><button onClick={copyEmail}>{Icon.mail}<span>{copied ? 'Email address copied' : email}</span></button></li>
           <li><a href={`tel:${phone.replace(/\s/g, '')}`}>{Icon.phone}<span>{phone}</span></a></li>
@@ -869,34 +829,16 @@ function Contact() {
   );
 }
 
-function Footer({ reduced }) {
-  const ref = useRef(null);
-  const [state, setState] = useState('idle');
-  useEffect(() => {
-    if (reduced) return undefined;
-    setState('ready');
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) { setState('in'); observer.disconnect(); }
-    }, { threshold: 0.35 });
-    observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [reduced]);
-
+function Footer() {
   return (
-    <footer className={`footer is-${state}`} ref={ref}>
-      <div className="footer-top">
-        <p className="footer-end"><span className="packet-key" aria-hidden="true" />You reached the end of the route. Thanks for reading all of it.</p>
-        <a className="button button-primary" href="#contact">Start a conversation</a>
-      </div>
-      <ReactiveName as="p" className="footer-name" lines={['Rohit Kumar']} sectionRef={ref} reduced={reduced} />
-      <div className="footer-row">
-        <p>Rohit Kumar, {new Date().getFullYear()}. Designed and built by hand.</p>
-        <div>
-          <a href={githubUrl} target="_blank" rel="noreferrer" aria-label="GitHub">{Icon.github}</a>
-          <a href={linkedinUrl} target="_blank" rel="noreferrer" aria-label="LinkedIn">{Icon.linkedin}</a>
-          <a href="#top">Back to top</a>
-        </div>
-      </div>
+    <footer className="footer">
+      <p>&copy; {new Date().getFullYear()} Rohit Kumar</p>
+      <nav className="footer-links" aria-label="Elsewhere">
+        <a href={githubUrl} target="_blank" rel="noreferrer">{Icon.github}<span>GitHub</span></a>
+        <a href={linkedinUrl} target="_blank" rel="noreferrer">{Icon.linkedin}<span>LinkedIn</span></a>
+        <a href={`mailto:${email}`}>{Icon.mail}<span>Email</span></a>
+        <a href="#top">Back to top</a>
+      </nav>
     </footer>
   );
 }
@@ -922,6 +864,7 @@ function App() {
 
   const actions = useMemo(() => [
     ...projects.map((project) => ({ label: project.name, hint: project.type, run: () => openProject(project.id) })),
+    { label: 'Experience', hint: 'Freelance full-stack developer', run: () => goTo('#experience') },
     { label: 'How I ship', hint: 'Five-step process', run: () => goTo('#process') },
     { label: 'About', hint: 'Background and education', run: () => goTo('#about') },
     { label: 'Terminal', hint: 'Type commands', run: () => goTo('#terminal') },
@@ -946,20 +889,20 @@ function App() {
 
   return (
     <>
-      <a className="skip" href="#work">Skip to work</a>
+      <a className="skip" href="#work">Skip to projects</a>
       <Nav onOpenPalette={() => setPaletteOpen(true)} />
       <RouteRail />
       <main>
         <Hero onSelect={openProject} reduced={reduced} />
-        <ScrollBand />
         <Work openId={openId} setOpenId={setOpenId} />
+        <Experience />
         <ProcessStory />
         <About />
         <Research />
         <Terminal onOpenProject={openProject} onGoTo={goTo} />
         <Contact />
       </main>
-      <Footer reduced={reduced} />
+      <Footer />
       <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} actions={actions} />
     </>
   );

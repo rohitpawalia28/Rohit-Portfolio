@@ -61,16 +61,6 @@ function useReducedMotion() {
   return reduced;
 }
 
-function useLocalTime() {
-  const format = () => new Intl.DateTimeFormat('en-IN', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' }).format(new Date());
-  const [time, setTime] = useState(format);
-  useEffect(() => {
-    const id = setInterval(() => setTime(format()), 20000);
-    return () => clearInterval(id);
-  }, []);
-  return time;
-}
-
 /* ================================================================== */
 /* The live system graph                                               */
 /* ================================================================== */
@@ -78,10 +68,12 @@ function useLocalTime() {
 /* Graphite + teal, matching the CSS tokens. `ink` is the text colour, `paper` the page, `cobalt` the accent. */
 const COLORS = { ink: '#ECEDEE', cobalt: '#2BB39A', fill: '#2BB39A', packet: '#5FE0C6', slate: '#868C93', line: 'rgba(236,237,238,0.13)', paper: '#111315', label: 'rgba(17,19,21,0.86)' };
 
-function SystemGraph({ onSelect, reduced }) {
+function SystemGraph({ onSelect, reduced, paused }) {
   const canvasRef = useRef(null);
   const selectRef = useRef(onSelect);
   selectRef.current = onSelect;
+  const pausedRef = useRef(paused);
+  pausedRef.current = paused;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -285,7 +277,7 @@ function SystemGraph({ onSelect, reduced }) {
         ctx.globalAlpha = (dimmed ? 0.25 : 1) * age;
 
         if (node.kind === 'core') {
-          const pulse = reduced ? 0 : (Math.sin(time / 700) + 1) * 3;
+          const pulse = reduced || pausedRef.current ? 0 : (Math.sin(time / 700) + 1) * 3;
           ctx.beginPath();
           ctx.arc(node.x, node.y, 22 + pulse, 0, Math.PI * 2);
           ctx.strokeStyle = 'rgba(43,179,154,0.4)';
@@ -361,7 +353,7 @@ function SystemGraph({ onSelect, reduced }) {
       if (visible && width) {
         frame += 1;
         step();
-        if (!reduced) advancePackets();
+        if (!reduced && !pausedRef.current) advancePackets();
         draw(time);
       }
       requestAnimationFrame(loop);
@@ -484,7 +476,7 @@ function ReactiveName({ lines, sectionRef, reduced, as: Tag = 'h1', className = 
 
   let count = 0;
   return (
-    <Tag ref={ref} className={`name ${className}`} aria-label={lines.join(' ')}>
+    <Tag ref={ref} className={`name ${className}`} aria-label={lines.join(' ')} translate="no">
       {lines.map((line) => (
         <span className="name-line" key={line} aria-hidden="true">
           {line.split('').map((char) => {
@@ -539,7 +531,7 @@ function CommandPalette({ open, onClose, actions }) {
             value={query}
             onChange={(event) => { setQuery(event.target.value); setActive(0); }}
             onKeyDown={onKey}
-            placeholder="Jump to a project, section, or link"
+            placeholder="Search projects, sections, links…"
             aria-label="Search"
           />
           <kbd>Esc</kbd>
@@ -578,7 +570,7 @@ function Nav({ onOpenPalette }) {
 
   return (
     <header className={`nav ${scrolled ? 'is-scrolled' : ''} ${menu ? 'is-open' : ''}`}>
-      <a className="nav-name" href="#top" onClick={close}>Rohit Kumar</a>
+      <a className="nav-name" href="#top" onClick={close} translate="no">Rohit Kumar</a>
       <nav className="nav-links" aria-label="Main">
         <a href="#work" onClick={close}>Projects</a>
         <a href="#experience" onClick={close}>Experience</a>
@@ -587,7 +579,7 @@ function Nav({ onOpenPalette }) {
         <a href="#contact" onClick={close}>Contact</a>
       </nav>
       <button className="nav-jump" onClick={onOpenPalette}>
-        {Icon.search}<span>Jump to</span><kbd>{isMac ? '⌘' : 'Ctrl'} K</kbd>
+        {Icon.search}<span>Jump To</span><kbd>{isMac ? '⌘\u00A0K' : 'Ctrl\u00A0K'}</kbd>
       </button>
       <button className="nav-menu" onClick={() => setMenu(!menu)} aria-expanded={menu} aria-label={menu ? 'Close menu' : 'Open menu'}>
         <i /><i />
@@ -598,34 +590,39 @@ function Nav({ onOpenPalette }) {
 
 function Hero({ onSelect, reduced }) {
   const sectionRef = useRef(null);
-  const time = useLocalTime();
+  const [paused, setPaused] = useState(false);
   return (
     <section className="hero" id="top" ref={sectionRef}>
-      <SystemGraph onSelect={onSelect} reduced={reduced} />
+      <SystemGraph onSelect={onSelect} reduced={reduced} paused={paused} />
       <div className="hero-copy">
-        <p className="hero-status"><span className="signal" aria-hidden="true" />Open to internships and freelance work</p>
         <ReactiveName lines={['Rohit', 'Kumar']} sectionRef={sectionRef} reduced={reduced} />
-        <p className="hero-role">Full-stack developer</p>
-        <p className="hero-lede">I build web systems that people run their day on: bookings, classrooms, dashboards, and live updates.</p>
+        <p className="hero-role">Full-Stack Developer</p>
+        <p className="hero-lede">I build web systems that people run their day on: bookings, classrooms, dashboards, and live updates. Open to internships and freelance work.</p>
         <div className="hero-actions">
-          <a className="button button-primary" href="#work">View projects</a>
-          <a className="button button-plain" href={resumeUrl} target="_blank" rel="noreferrer">Open résumé {Icon.external}</a>
+          <a className="button button-primary" href="#work">View Projects</a>
+          <a className="button button-plain" href={resumeUrl} target="_blank" rel="noreferrer">Open Résumé {Icon.external}</a>
         </div>
       </div>
       <div className="hero-strip">
         <dl>
           <div><dt>Studying</dt><dd>B.Tech IT, VIT Vellore, 2023–2027</dd></div>
           <div><dt>Based in</dt><dd>Gurugram, India</dd></div>
-          <div><dt>Local time</dt><dd>{time} IST</dd></div>
         </dl>
-        <a className="scroll-cue" href="#work" aria-label="Scroll to projects">
-          <span className="scroll-cue-line" aria-hidden="true"><i /></span>
-          <span>Scroll</span>
-        </a>
-        <p className="graph-hint">
-          <span className="packet-key" aria-hidden="true" />
-          <span>Everything I&rsquo;ve built, wired to the tools behind it. <span className="hint-pointer">Drag a node, or click a project to open it.</span><span className="hint-touch">Tap a project to open it.</span></span>
-        </p>
+        <div className="graph-controls">
+          <p className="graph-hint">
+            Everything I&rsquo;ve built, wired to the tools behind it. <span className="hint-pointer">Drag a node, or click a project to open it.</span><span className="hint-touch">Tap a project to open it.</span>
+          </p>
+          {!reduced && (
+            <button className="graph-pause" onClick={() => setPaused(!paused)} aria-pressed={paused}>
+              {paused ? 'Play Motion' : 'Pause Motion'}
+            </button>
+          )}
+        </div>
+        <nav className="graph-keys" aria-label="Open a project from the graph">
+          {projects.map((project) => (
+            <button key={project.id} onClick={() => onSelect(project.id)}>{project.name}</button>
+          ))}
+        </nav>
       </div>
     </section>
   );
@@ -636,7 +633,7 @@ function Work({ openId, setOpenId }) {
     <section className="work" id="work">
       <header className="section-head">
         <Sweep>Projects</Sweep>
-        <p>Two paid client systems running in production, and two data and security projects built at VIT. Open any project to see how it works.</p>
+        <p>2 paid client systems running in production, and 2 data and security projects built at VIT. Open any project to see how it works.</p>
       </header>
       <ul className="cases">
         {projects.map((project) => {
@@ -710,9 +707,10 @@ function About() {
         <div className="portrait-frame"><img src="/rohit.webp" alt="Rohit Kumar" loading="lazy" width="900" height="1099" /></div>
       </figure>
       <div className="about-copy">
-        <Sweep>I like the part where a requirement turns into something people use every day.</Sweep>
-        <p>I&rsquo;m a final-year Information Technology student at VIT Vellore. From March to June 2026 I worked freelance and shipped two paid client systems, from the first requirements call through MongoDB, admin workflows, and production deploys.</p>
-        <p>I&rsquo;m also a co-inventor on three published Indian patent applications in applied AI, which taught me to test an idea properly before calling it done.</p>
+        <Sweep>About Me</Sweep>
+        <p className="about-lead">I like the part where a requirement turns into something people use every day.</p>
+        <p>I&rsquo;m a final-year Information Technology student at VIT Vellore. From March to June 2026 I worked freelance and shipped 2 paid client systems, from the first requirements call through MongoDB, admin workflows, and production deploys.</p>
+        <p>I&rsquo;m also a co-inventor on 3 published Indian patent applications in applied AI, which taught me to test an idea properly before calling it done.</p>
 
         <div className="about-columns">
           <div>
@@ -724,7 +722,7 @@ function About() {
             </ol>
           </div>
           <div>
-            <h3>What I work with</h3>
+            <h3>What I Work With</h3>
             <dl className="toolkit">
               {toolkit.map(([group, items]) => (
                 <div key={group}><dt>{group}</dt><dd>{items.join(', ')}</dd></div>
@@ -742,7 +740,7 @@ function Research() {
     <section className="research" id="research">
       <header className="section-head">
         <Sweep>Research</Sweep>
-        <p>Co-inventor on three published Indian patent applications exploring adaptive AI, behavioral risk analysis, and interpretable language models.</p>
+        <p>Co-inventor on 3 published Indian patent applications exploring adaptive AI, behavioral risk analysis, and interpretable language models.</p>
       </header>
       <ul className="patents">
         {patents.map((title) => (
@@ -792,7 +790,7 @@ function Contact() {
   return (
     <section className="contact" id="contact">
       <div className="contact-intro">
-        <Sweep>Get in touch</Sweep>
+        <Sweep>Get in Touch</Sweep>
         <p>Hiring for an internship or role, or need a web system built? Send a message and I&rsquo;ll reply within a day.</p>
         <ul className="contact-links">
           <li><button onClick={copyEmail}>{Icon.mail}<span>{copied ? 'Email address copied' : email}</span></button></li>
@@ -805,23 +803,23 @@ function Contact() {
       <form className="contact-form" onSubmit={sendMessage}>
         <label>
           <span>Your name</span>
-          <input name="name" required minLength="2" autoComplete="name" />
+          <input name="name" required minLength="2" autoComplete="name" placeholder="Priya Sharma…" />
         </label>
         <label>
           <span>Email</span>
-          <input name="email" type="email" required autoComplete="email" />
+          <input name="email" type="email" inputMode="email" required autoComplete="email" spellCheck={false} placeholder="priya@company.com…" />
         </label>
         <label>
           <span>Message</span>
-          <textarea name="message" required minLength="10" rows="5" placeholder="What are you working on, and where could I help?" />
+          <textarea name="message" required minLength="10" rows="5" autoComplete="off" placeholder="We’re hiring a full-stack intern for…" />
         </label>
         <div className="form-foot">
           <button className="button button-primary" type="submit" disabled={state.phase === 'sending'}>
-            {state.phase === 'sending' ? 'Sending…' : 'Send message'}
+            {state.phase === 'sending' ? 'Sending…' : 'Send Message'}
           </button>
           <p className={`form-status is-${state.phase}`} role="status">
             {state.phase === 'sent' && `Message sent. I’ll reply to ${state.email}.`}
-            {state.phase === 'error' && 'Message not sent: the server didn’t respond. Try again, or email me directly.'}
+            {state.phase === 'error' && 'Message not sent: the server didn’t respond. Try again in a minute, or email me directly.'}
           </p>
         </div>
       </form>
@@ -849,7 +847,24 @@ function Footer() {
 
 function App() {
   const reduced = useReducedMotion();
-  const [openId, setOpenId] = useState('ace');
+  const [openId, setOpenIdState] = useState(() => {
+    const fromUrl = new URLSearchParams(window.location.search).get('project');
+    return projects.some((project) => project.id === fromUrl) ? fromUrl : 'ace';
+  });
+  const setOpenId = useCallback((id) => {
+    setOpenIdState(id);
+    const url = new URL(window.location.href);
+    if (id) url.searchParams.set('project', id); else url.searchParams.delete('project');
+    window.history.replaceState(null, '', url);
+  }, []);
+
+  /* Arriving on a shared ?project= link scrolls straight to that case. */
+  useEffect(() => {
+    const fromUrl = new URLSearchParams(window.location.search).get('project');
+    if (fromUrl && projects.some((project) => project.id === fromUrl)) {
+      setTimeout(() => document.getElementById(`case-${fromUrl}`)?.scrollIntoView({ block: 'start' }), 300);
+    }
+  }, []);
   const [paletteOpen, setPaletteOpen] = useState(false);
 
   const goTo = useCallback((hash) => {
@@ -860,12 +875,12 @@ function App() {
     if (id === 'research') { goTo('#research'); return; }
     setOpenId(id);
     requestAnimationFrame(() => goTo(`#case-${id}`));
-  }, [goTo]);
+  }, [goTo, setOpenId]);
 
   const actions = useMemo(() => [
     ...projects.map((project) => ({ label: project.name, hint: project.type, run: () => openProject(project.id) })),
     { label: 'Experience', hint: 'Freelance full-stack developer', run: () => goTo('#experience') },
-    { label: 'How I ship', hint: 'Five-step process', run: () => goTo('#process') },
+    { label: 'How I Ship', hint: '5-step process', run: () => goTo('#process') },
     { label: 'About', hint: 'Background and education', run: () => goTo('#about') },
     { label: 'Terminal', hint: 'Type commands', run: () => goTo('#terminal') },
     { label: 'Research', hint: 'Patent applications', run: () => goTo('#research') },

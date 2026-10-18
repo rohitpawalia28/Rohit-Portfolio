@@ -262,7 +262,7 @@ export function ProcessStory() {
     <section className="process" id="process" ref={sectionRef} style={{ '--steps': processSteps.length }}>
       <div className="process-sticky">
         <div className="process-copy">
-          <Sweep>How I ship a client system</Sweep>
+          <Sweep>How I Ship a Client System</Sweep>
           <p className="process-intro">Scroll to watch one get built, using ACE Academy as the example.</p>
           <ol className="process-steps">
             {processSteps.map((step, i) => (
@@ -320,12 +320,12 @@ function respond(raw, { onOpenProject, onGoTo }) {
     case 'ls':
       return [
         ...projects.map((project) => ({ text: `${project.year}  ${project.id.padEnd(6)} ${project.name}` })),
-        { text: 'Type "open ace" (or salon, taxi, ids) to jump to one.', tone: 'dim' },
+        { text: 'Type “open ace” (or salon, taxi, ids) to jump to one.', tone: 'dim' },
       ];
     case 'open':
     case 'cd': {
       const match = projects.find((project) => project.id === arg || project.name.toLowerCase().includes(arg));
-      if (!arg || !match) return [{ text: `No project called "${arg}". Try: ${projects.map((p) => p.id).join(', ')}.`, tone: 'err' }];
+      if (!arg || !match) return [{ text: `No project called “${arg}”. Try: ${projects.map((p) => p.id).join(', ')}.`, tone: 'err' }];
       setTimeout(() => onOpenProject(match.id), 600);
       return [{ text: `Opening ${match.name}…`, tone: 'ok' }];
     }
@@ -350,7 +350,7 @@ function respond(raw, { onOpenProject, onGoTo }) {
     case 'date':
       return [{ text: `${new Intl.DateTimeFormat('en-IN', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Kolkata' }).format(new Date())} IST` }];
     default:
-      return [{ text: `command not found: ${command}. Type "help" to see what's available.`, tone: 'err' }];
+      return [{ text: `command not found: ${command}. Type “help” to see what’s available.`, tone: 'err' }];
   }
 }
 
@@ -420,7 +420,7 @@ export function Terminal({ onOpenProject, onGoTo }) {
   return (
     <section className="terminal-section" id="terminal" ref={sectionRef}>
       <div className="terminal-copy">
-        <Sweep>Quick lookup</Sweep>
+        <Sweep>Quick Lookup</Sweep>
         <p>Prefer the command line? Everything on this page is available as a command. Type one, or tap a suggestion.</p>
         <div className="terminal-suggestions">
           {['help', 'projects', 'experience', 'stack', 'contact'].map((command) => (

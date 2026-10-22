@@ -133,3 +133,34 @@ export const experience = [
     stack: ['React', 'Node.js', 'Express', 'MongoDB', 'Socket.IO', 'Vercel'],
   },
 ];
+
+/* Ship Log: the career timeline, told as a commit history. */
+export const shipLog = [
+  { date: '2021', type: 'init', title: 'Class 10 at Navy Children School', body: 'Karanja, Navi Mumbai. Where the first lines of code happened.' },
+  { date: '2023', type: 'feat', title: 'Class 12 done, B.Tech IT begins', body: 'PCM at Yaduvanshi Shiksha Niketan, Rewari, then Information Technology at VIT Vellore.' },
+  { date: '2025', type: 'feat', title: 'Data and security projects', body: 'Route-level fare anomalies across 32 GB of NYC taxi trips in PySpark, and an entropy-based intrusion detector for live packet captures.' },
+  { date: '2026', type: 'docs', title: '3 patent applications published', body: 'Co-inventor on Indian patent applications in adaptive AI, behavioral risk scoring and interpretable language models.' },
+  { date: 'Mar – Jun 2026', type: 'release', title: 'Freelance full-stack developer', body: 'Shipped 2 paid client systems end to end: ACE Academy and the Platinum Unisex Salon website.' },
+  { date: 'Aug 2026', type: 'chore', title: 'AWS Certified Cloud Practitioner', body: 'Foundational AWS certification, valid until 2029.' },
+  { date: '2027', type: 'next', title: 'Graduating. Open to roles.', body: 'Looking for full-stack internships and freelance work where real people depend on what gets built.' },
+];
+
+/* Stack ring: the toolkit grouped the way the work actually uses it. */
+export const stackGroups = [
+  { name: 'Interfaces', items: ['React', 'JavaScript', 'HTML', 'CSS'] },
+  { name: 'Servers', items: ['Node.js', 'Express', 'REST APIs', 'Socket.IO'] },
+  { name: 'Data', items: ['MongoDB', 'MySQL', 'PySpark', 'Pandas'] },
+  { name: 'Shipping', items: ['Vercel', 'Render', 'Git', 'CI/CD'] },
+  { name: 'Cloud', items: ['AWS', 'Certified Cloud Practitioner'] },
+  { name: 'Security and ML', items: ['Python', 'Flask', 'Scapy', 'Scikit-learn'] },
+];
+
+/* Work strip: real renders of each project. */
+export const workCards = [
+  { project: 'ace', image: '/work/ace-home.webp', label: 'ACE Academy, home page' },
+  { project: 'ace', image: '/work/ace-courses.webp', label: 'ACE Academy, fees and enrolment' },
+  { project: 'ace', image: '/work/ace-login.webp', label: 'ACE Academy, student portal sign-in' },
+  { project: 'salon', image: '/work/salon.webp', label: 'Platinum Unisex Salon, home page' },
+  { project: 'taxi', image: '/work/taxi.webp', label: 'Taxi route anomalies, PySpark output' },
+  { project: 'ids', image: '/work/ids.webp', label: 'Sentinel IDS, entropy over captured traffic' },
+];

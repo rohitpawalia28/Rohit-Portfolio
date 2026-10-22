@@ -160,12 +160,14 @@ function Hero({ reduced }) {
     portrait.style.transform = `translate3d(-50%, ${e * 8}vh, 0) scale(${1 - e * 0.1})`;
     portrait.style.filter = `brightness(${1 - e * 0.55})`;
     meta.style.opacity = String(1 - seg(p, 0, 0.35));
+    if (parts.current.glow) parts.current.glow.style.opacity = String(1 - seg(p, 0.05, 0.7));
   }, !reduced);
 
   const set = (key) => (el) => { parts.current[key] = el; };
   return (
     <section className="s-hero" id="top" ref={ref}>
       <div className="pin">
+        <div className="hero-glow" ref={set('glow')} aria-hidden="true" />
         <h1 className="hero-title" aria-label="Rohit Kumar, full-stack developer">
           <span className="hero-word hero-back" ref={set('back')} aria-hidden="true">
             {'ROHIT'.split('').map((c, i) => <span key={i} style={{ '--i': i }}>{c}</span>)}
@@ -174,7 +176,7 @@ function Hero({ reduced }) {
             {'KUMAR'.split('').map((c, i) => <span key={i} style={{ '--i': i + 5 }}>{c}</span>)}
           </span>
         </h1>
-        <img className="hero-portrait" ref={set('portrait')} src="/rohit-cut.webp" alt="" width="1000" height="1221" fetchpriority="high" />
+        <img className="hero-portrait" ref={set('portrait')} src="/hero-silhouette.webp" alt="" width="1200" height="1100" fetchpriority="high" />
         <div className="hero-meta" ref={set('meta')}>
           <div className="hero-meta-left">
             <p className="hero-role">Full-Stack Developer</p>

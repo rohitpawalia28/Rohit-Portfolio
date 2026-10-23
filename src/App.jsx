@@ -118,8 +118,8 @@ function useOnce(ref, amount = 0.4) {
 /* ================================================================== */
 
 const navLinks = [
-  { label: 'Work', href: '#work' },
   { label: 'Journey', href: '#log' },
+  { label: 'Work', href: '#work' },
   { label: 'Stack', href: '#stack' },
   { label: 'Research', href: '#research' },
   { label: 'Contact', href: '#contact' },

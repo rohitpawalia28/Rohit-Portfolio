@@ -483,14 +483,12 @@ function Stack({ reduced, narrow }) {
   const n = stackGroups.length;
   const step = 360 / n;
 
-  useScene(ref, (p, { el }) => {
+  useScene(ref, (p) => {
     if (!ring.current) return;
     const rise = easeOut(seg(p, 0, 0.14));
-    const spin = seg(p, 0.12, 0.8) * (n - 1);
-    const tone = 1 - easeInOut(seg(p, 0.84, 1));
-    el.style.setProperty('--tone', tone.toFixed(3));
+    const spin = seg(p, 0.1, 0.6) * (n - 1);
     ring.current.style.transform = `translate3d(0, ${(1 - rise) * 30}vh, 0) rotate(${-spin * step}deg) scale(${0.8 + rise * 0.2})`;
-    ring.current.style.opacity = String(rise * tone);
+    ring.current.style.opacity = String(rise);
     setActive(clamp(Math.round(spin), 0, n - 1));
   }, !reduced);
 
@@ -500,7 +498,7 @@ function Stack({ reduced, narrow }) {
       <div className="pin">
         <h2 className="stack-title">The Stack</h2>
         <div className="stack-stage">
-          <div className="stack-ring" ref={ring} style={{ '--r': narrow ? '34vw' : 'min(12.5rem, 25vh)' }}>
+          <div className="stack-ring" ref={ring} style={{ '--r': narrow ? '34vw' : 'min(14rem, 28vh)' }}>
             {stackGroups.map((item, i) => (
               <div className={`stack-card ${i === active ? 'is-active' : ''}`} key={item.name} style={{ '--a': `${i * step}deg` }}>
                 <div className="stack-face">
@@ -598,9 +596,14 @@ function ResearchCard({ item, index }) {
   );
 }
 
-function Research() {
+function Research({ reduced }) {
+  const ref = useRef(null);
+  /* the sheet slides up over the stack and darkens as it rises */
+  useScene(ref, (_, { rect, el }) => {
+    el.style.setProperty('--tone', easeInOut(clamp(1 - rect.top / window.innerHeight)).toFixed(3));
+  }, !reduced);
   return (
-    <section className="s-research" id="research">
+    <section className="s-research" id="research" ref={ref}>
       <div className="research-head">
         <h2>Research</h2>
         <div className="research-intro">
@@ -987,7 +990,7 @@ function App() {
             <ShipLog reduced={reduced} />
             <Work reduced={reduced} narrow={narrow} focusRef={focusWork} />
             <Stack reduced={reduced} narrow={narrow} />
-            <Research />
+            <Research reduced={reduced} />
           </main>
           <Contact reduced={reduced} />
         </>

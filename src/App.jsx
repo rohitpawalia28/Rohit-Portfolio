@@ -216,16 +216,17 @@ function Whoami({ reduced, narrow }) {
   const [typed, setTyped] = useState(reduced ? 6 : 0);
   const [expanded, setExpanded] = useState(reduced);
 
-  useScene(ref, (p) => {
+  useScene(ref, (p, { rect }) => {
     const { win, chrome, left, right, about, prompt } = parts.current;
     if (!win) return;
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     const baseW = Math.min(narrow ? vw * 0.82 : 520, vw - 32);
     const baseH = narrow ? 230 : 300;
-    const appear = easeOut(seg(p, 0, 0.1));
-    const split = easeInOut(seg(p, 0.1, 0.36));
-    const grow = easeInOut(seg(p, 0.36, 0.66));
+    /* the terminal arrives while the sheet is still sliding up, so the screen is never empty */
+    const appear = easeOut(seg(clamp(1 - rect.top / vh), 0.25, 0.85));
+    const split = easeInOut(seg(p, 0, 0.3));
+    const grow = easeInOut(seg(p, 0.3, 0.6));
     const w = lerp(baseW * (0.86 + appear * 0.14), vw, grow);
     const h = lerp(baseH * (0.86 + appear * 0.14), vh, grow);
     const r = lerp(18, 0, grow);
@@ -236,20 +237,20 @@ function Whoami({ reduced, narrow }) {
     win.style.backgroundColor = `rgb(${WIN_FROM.map((c, i) => Math.round(lerp(c, WIN_TO[i], grow))).join(',')})`;
     chrome.style.transform = `translate3d(${insetX}px, ${insetY}px, 0)`;
     chrome.style.width = `${w}px`;
-    chrome.style.opacity = String(appear * (1 - seg(p, 0.58, 0.66)));
+    chrome.style.opacity = String(appear * (1 - seg(p, 0.52, 0.6)));
     const spread = split * (narrow ? 0.34 : 0.4) * vw;
     left.style.transform = `translate3d(${-spread}px, 0, 0)`;
     right.style.transform = `translate3d(${spread}px, 0, 0)`;
-    const wordsOut = 1 - seg(p, 0.42, 0.58);
+    const wordsOut = 1 - seg(p, 0.36, 0.52);
     left.style.opacity = String(appear * wordsOut);
     right.style.opacity = String(appear * wordsOut);
     left.style.filter = `blur(${(1 - wordsOut) * 18}px)`;
     right.style.filter = `blur(${(1 - wordsOut) * 18}px)`;
-    prompt.style.opacity = String(1 - seg(p, 0.52, 0.64));
-    about.style.opacity = String(seg(p, 0.64, 0.76));
-    about.style.transform = `translate3d(0, ${(1 - seg(p, 0.64, 0.8)) * 40}px, 0)`;
-    setTyped(Math.round(seg(p, 0.1, 0.34) * 6));
-    setExpanded(p > 0.66);
+    prompt.style.opacity = String(1 - seg(p, 0.46, 0.58));
+    about.style.opacity = String(seg(p, 0.58, 0.7));
+    about.style.transform = `translate3d(0, ${(1 - seg(p, 0.58, 0.74)) * 40}px, 0)`;
+    setTyped(Math.round(clamp(seg(clamp(1 - rect.top / vh), 0.6, 1) * 0.5 + seg(p, 0, 0.26) * 0.5) * 6));
+    setExpanded(p > 0.6);
   }, !reduced);
 
   const set = (key) => (el) => { parts.current[key] = el; };

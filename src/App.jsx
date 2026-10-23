@@ -392,7 +392,7 @@ function Work({ reduced, narrow, focusRef }) {
     const radius = (cardW / 2) / Math.tan(step / 2) * 1.04;
     const settle = easeOut(seg(p, 0, 0.1));
     const R = lerp(radius * 4, radius, settle);
-    const index = seg(p, 0.08, 0.56) * (count - 1);
+    const index = seg(p, 0.08, 0.6) * (count - 1);
     const angle = index * stepDeg;
     ring.current.style.transform = `translate3d(0,0,${R}px) rotateY(${angle}deg)`;
     cards.current.forEach((card, i) => {
@@ -429,7 +429,7 @@ function Work({ reduced, narrow, focusRef }) {
     const el = ref.current;
     if (i < 0 || !el) return;
     const travel = el.offsetHeight - window.innerHeight;
-    const p = 0.08 + (i / (count - 1)) * 0.48;
+    const p = 0.08 + (i / (count - 1)) * 0.52;
     window.scrollTo({ top: el.offsetTop + travel * p, behavior: 'auto' });
   };
 
@@ -441,7 +441,7 @@ function Work({ reduced, narrow, focusRef }) {
       <div className="pin">
         <div className="work-head">
           <h2 className="work-title">Shipped Work</h2>
-          <p>4 projects. Click a screen to open it, or read the full story.</p>
+          <p>{count} projects. Click a screen to open it, or read the full story.</p>
         </div>
         <div className="work-stage">
           <div className="work-ring" ref={ring}>

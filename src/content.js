@@ -75,6 +75,23 @@ export const projects = [
     ],
     links: [{ label: 'Read the code', href: 'https://github.com/rohitpawalia28/entropy-zero-day-detection' }],
   },
+  {
+    id: 'cognishield',
+    name: 'CogniShield',
+    short: 'CogniShield',
+    type: 'AI image protection',
+    year: '2026',
+    role: 'Academic project',
+    description: 'A local tool that adds a barely visible change to an image to disrupt AI image-to-image models, checks that it survives JPEG compression, and signs the result so anyone can confirm it has not been altered.',
+    stack: ['Python', 'Flask', 'PyTorch', 'OpenCV'],
+    flow: [
+      { stage: 'Input', items: ['PNG, JPG or WEBP image'] },
+      { stage: 'Protection', items: ['Edge-aware, high-frequency perturbation'] },
+      { stage: 'Checks', items: ['PSNR and SSIM', 'JPEG quality 95 to 50'] },
+      { stage: 'Output', items: ['Protected PNG', 'Ed25519-signed provenance'] },
+    ],
+    links: [{ label: 'Read the code', href: 'https://github.com/rohitpawalia28/Cognishield' }],
+  },
 ];
 
 export const patents = [
@@ -161,6 +178,7 @@ export const workCards = [
   { project: 'salon', image: '/work/salon.webp', label: 'Platinum Unisex Salon, home page', go: 'live' },
   { project: 'taxi', image: '/work/taxi.webp', label: 'Taxi route anomalies, PySpark output', go: 'code' },
   { project: 'ids', image: '/work/ids.webp', label: 'Sentinel IDS, entropy over captured traffic', go: 'code' },
+  { project: 'cognishield', image: '/work/cognishield.webp', label: 'CogniShield, protect an image before sharing it', go: 'code' },
 ];
 
 /* Project pages: the longer story behind each card. */
@@ -209,6 +227,18 @@ export const projectDetails = {
       'A Flask report with protocol breakdowns and watched ports.',
     ],
     outcome: 'An academic project in network security.',
+  },
+  cognishield: {
+    gallery: [{ src: '/work/cognishield.webp', caption: 'Upload step of the local web app' }],
+    problem: 'Photos shared online can be fed straight into AI image-to-image models. The aim: protect an image before it is shared without visibly changing it, and prove later that it has not been tampered with.',
+    built: [
+      'An edge-aware, high-frequency perturbation with reproducible seeds, kept small enough to be hard to see.',
+      'Quality metrics (PSNR, SSIM, MSE, mean and max pixel change) to measure the visual trade-off.',
+      'JPEG robustness tests at quality 95, 85, 75, 60 and 50.',
+      'Ed25519 signing over a SHA-256 hash, with a provenance file and a check for any change after signing.',
+      'An optional before-and-after test against a local SD-Turbo model, plus a Flask web app and batch CLI that run entirely on your own computer.',
+    ],
+    outcome: 'An academic project in AI security: a review-ready prototype that runs locally, with no images uploaded anywhere.',
   },
 };
 

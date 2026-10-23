@@ -220,7 +220,7 @@ kbd { font: inherit; font-size: 12px; font-weight: 600; line-height: 1; padding:
 /* ------------------------------------------------------------------ */
 
 .s-work {
-  position: relative; z-index: 4; margin-top: -100vh; height: 360vh;
+  position: relative; z-index: 4; margin-top: -100vh; height: 400vh;
   border-radius: var(--radius-scene) var(--radius-scene) 0 0; box-shadow: 0 -30px 70px rgba(0, 0, 0, .45);
 }
 .s-work .pin { border-radius: var(--radius-scene) var(--radius-scene) 0 0; }

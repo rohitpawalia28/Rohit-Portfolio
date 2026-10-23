@@ -141,7 +141,7 @@ export const shipLog = [
   { date: '2025', type: 'feat', title: 'Data and security projects', body: 'Route-level fare anomalies across 32 GB of NYC taxi trips in PySpark, and an entropy-based intrusion detector for live packet captures.' },
   { date: '2026', type: 'docs', title: '3 patent applications published', body: 'Co-inventor on Indian patent applications in adaptive AI, behavioral risk scoring and interpretable language models.' },
   { date: 'Mar – Jun 2026', type: 'release', title: 'Freelance full-stack developer', body: 'Shipped 2 paid client systems end to end: ACE Academy and the Platinum Unisex Salon website.' },
-  { date: 'Aug 2026', type: 'chore', title: 'AWS Certified Cloud Practitioner', body: 'Foundational AWS certification, valid until 2029.' },
+  { date: 'Oct 2026', type: 'cert', title: 'MongoDB Vector Search certified', body: 'Building AI-Powered Search with MongoDB Vector Search, issued by MongoDB: indexing, embeddings and retrieval strategies.', href: 'https://www.credly.com/badges/bf22f614-31f1-418c-8050-36155eab5717' },
   { date: '2027', type: 'next', title: 'Graduating. Open to roles.', body: 'Looking for full-stack internships and freelance work where real people depend on what gets built.' },
 ];
 
@@ -151,16 +151,70 @@ export const stackGroups = [
   { name: 'Servers', items: ['Node.js', 'Express', 'REST APIs', 'Socket.IO'] },
   { name: 'Data', items: ['MongoDB', 'MySQL', 'PySpark', 'Pandas'] },
   { name: 'Shipping', items: ['Vercel', 'Render', 'Git', 'CI/CD'] },
-  { name: 'Cloud', items: ['AWS', 'Certified Cloud Practitioner'] },
+  { name: 'Cloud and AI search', items: ['AWS', 'MongoDB Atlas', 'Vector Search'] },
   { name: 'Security and ML', items: ['Python', 'Flask', 'Scapy', 'Scikit-learn'] },
 ];
 
-/* Work strip: real renders of each project. */
+/* Work ring: one card per project, each opening the live thing. */
 export const workCards = [
-  { project: 'ace', image: '/work/ace-home.webp', label: 'ACE Academy, home page' },
-  { project: 'ace', image: '/work/ace-courses.webp', label: 'ACE Academy, fees and enrolment' },
-  { project: 'ace', image: '/work/ace-login.webp', label: 'ACE Academy, student portal sign-in' },
-  { project: 'salon', image: '/work/salon.webp', label: 'Platinum Unisex Salon, home page' },
-  { project: 'taxi', image: '/work/taxi.webp', label: 'Taxi route anomalies, PySpark output' },
-  { project: 'ids', image: '/work/ids.webp', label: 'Sentinel IDS, entropy over captured traffic' },
+  { project: 'ace', image: '/work/ace-suite.webp', label: 'ACE Academy, home, fees and student portal', go: 'live' },
+  { project: 'salon', image: '/work/salon.webp', label: 'Platinum Unisex Salon, home page', go: 'live' },
+  { project: 'taxi', image: '/work/taxi.webp', label: 'Taxi route anomalies, PySpark output', go: 'code' },
+  { project: 'ids', image: '/work/ids.webp', label: 'Sentinel IDS, entropy over captured traffic', go: 'code' },
+];
+
+/* Project pages: the longer story behind each card. */
+export const projectDetails = {
+  ace: {
+    gallery: [
+      { src: '/work/ace-home.webp', caption: 'Public home page with admissions and courses' },
+      { src: '/work/ace-courses.webp', caption: 'Fees and enrolment plans' },
+      { src: '/work/ace-login.webp', caption: 'Sign-in for admins, teachers and students' },
+    ],
+    problem: 'The institute needed one place where admins, teachers and students handle attendance, timetables, marks, study materials and progress, instead of separate tools.',
+    built: [
+      'Three roles (admin, teacher, student), each with its own dashboard and only the actions that role needs.',
+      'Attendance, timetables, marks, study materials and progress tracking behind a REST API in Node.js and Express.',
+      'Live updates over Socket.IO, so a change made by a teacher shows up for students without a refresh.',
+      'A public site for admissions, courses and fee plans, linked to the same data.',
+    ],
+    outcome: 'Delivered as a paid client build and running in production on Vercel.',
+  },
+  salon: {
+    gallery: [{ src: '/work/salon.webp', caption: 'Home page with services and booking' }],
+    problem: 'The salon needed customers to book and send enquiries online, and the owner to manage all of it from one dashboard.',
+    built: [
+      'Online appointment booking, customer enquiries, service information, locations and opening hours.',
+      'An admin dashboard where the owner manages every enquiry and booking in one place.',
+      'Appointment-status updates after each visit, so the record stays accurate.',
+    ],
+    outcome: 'Delivered as a paid client build. The owner runs the day from the dashboard.',
+  },
+  taxi: {
+    gallery: [{ src: '/work/taxi.webp', caption: 'Flagged trips by distance and fare, from the PySpark output' }],
+    problem: 'Find fares that do not fit their route, across a dataset far too large to check by hand: 32 GB of NYC taxi trips.',
+    built: [
+      'PySpark jobs that clean and group 32 GB of NYC taxi trips by route.',
+      'Route-level fare anomaly scoring with Scikit-learn.',
+      'A Flask dashboard to explore flagged trips by route, distance and fare.',
+    ],
+    outcome: 'An academic project in data engineering and machine learning.',
+  },
+  ids: {
+    gallery: [{ src: '/work/ids.webp', caption: 'Packet entropy over time, with the alert threshold' }],
+    problem: 'Flag unusual network traffic in packet captures without relying only on known attack signatures.',
+    built: [
+      'Parsing for CSV, PCAP and PCAPNG captures with Scapy.',
+      'Windowed entropy analysis with a statistical alert threshold, plus risk scoring.',
+      'A Flask report with protocol breakdowns and watched ports.',
+    ],
+    outcome: 'An academic project in network security.',
+  },
+};
+
+/* Research: a plain-language line for each patent application. */
+export const research = [
+  { title: patents[0], field: 'Healthcare AI', motif: 'wave', summary: 'Scores behavioural risk for people in cognitive care over time, retrieving each person’s own history so recent change is weighed in context.' },
+  { title: patents[1], field: 'Multimodal AI', motif: 'rings', summary: 'A reminiscence companion that retrieves personal memories across modalities and adapts as the person’s engagement rises or falls.' },
+  { title: patents[2], field: 'Interpretable ML', motif: 'lattice', summary: 'Compresses a large language model into readable fuzzy rules, with a verified epsilon bound on how far the rules may drift from the model.' },
 ];
